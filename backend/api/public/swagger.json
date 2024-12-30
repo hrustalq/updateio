@@ -1,0 +1,151 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/example": {
+      "get": {
+        "operationId": "ExampleController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns list of examples",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/ExampleDto"
+                          }
+                        },
+                        "metadata": {
+                          "type": "object",
+                          "properties": {
+                            "timestamp": {
+                              "type": "string",
+                              "format": "date-time",
+                              "example": "2024-12-29T06:00:30.128Z"
+                            },
+                            "path": {
+                              "type": "string",
+                              "example": "http://localhost:3000/api/v1/"
+                            },
+                            "version": {
+                              "type": "string",
+                              "example": "1"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Example"
+        ]
+      }
+    },
+    "/example/{id}": {
+      "get": {
+        "operationId": "ExampleController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns single example",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/ExampleDto"
+                        },
+                        "metadata": {
+                          "type": "object",
+                          "properties": {
+                            "timestamp": {
+                              "type": "string",
+                              "format": "date-time",
+                              "example": "2024-12-29T06:00:30.129Z"
+                            },
+                            "path": {
+                              "type": "string",
+                              "example": "http://localhost:3000/api/v1/"
+                            },
+                            "version": {
+                              "type": "string",
+                              "example": "1"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Example"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "API Documentation",
+    "description": "API documentation for the application.\n\nDownload [swagger.json](/public/swagger.json)",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local environment"
+    },
+    {
+      "url": "https://api.production.com",
+      "description": "Production environment"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "ExampleDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "The unique identifier of the example",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the example",
+            "example": "Example 1"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      }
+    }
+  }
+}
