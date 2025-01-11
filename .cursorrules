@@ -1,0 +1,10 @@
+This project stands for updating games for clients.
+It provides several features:
+  - Monitoring discord for game updates and sending them to the api for future use
+  - User notifications for game updates in telegram
+
+Applications:
+
+  - Api - NestJS application for handling game updates and user notifications
+  - Discord bot - Discord bot for monitoring discord for game updates and sending them to the api
+  - Telegram bot - Telegram bot for sending user notifications
