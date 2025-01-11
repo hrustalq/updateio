@@ -37,6 +37,7 @@ pnpm run infra:down
 ### Redis
 - Host: localhost
 - Port: 6379
+- Password: redis (configurable via REDIS_PASSWORD)
 
 ### RabbitMQ
 - Host: localhost
@@ -45,6 +46,15 @@ pnpm run infra:down
 - Management UI URL: http://localhost:15672
 - User: rabbit
 - Password: rabbit
+
+### MinIO
+- API Endpoint: http://localhost:9000
+- Console URL: http://localhost:9001
+- Access Key: minioadmin
+- Secret Key: minioadmin
+- Console login credentials:
+  - Username: minioadmin
+  - Password: minioadmin
 
 ## Monitoring
 
@@ -57,4 +67,14 @@ Access Grafana at http://localhost:3200
 ### Log Sources:
 - System logs
 - Container logs (via Promtail)
+
+## Configuration
+
+Copy the example environment file and modify if needed:
+
+```bash
+cp infrastructure/docker/.env.example infrastructure/docker/.env
+```
+
+Default credentials can be overridden using environment variables in the `.env` file.
 

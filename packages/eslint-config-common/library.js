@@ -6,6 +6,10 @@ const project = resolve(process.cwd(), "tsconfig.json");
 module.exports = {
   extends: ["eslint:recommended", "prettier", "turbo"],
   plugins: ["only-warn"],
+  rules: {
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
+  },
   globals: {
     React: true,
     JSX: true,

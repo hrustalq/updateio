@@ -3,14 +3,13 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "builder": "swc",
+    "typeCheck": true,
+    "plugins": ["@nestjs/swagger"]
   },
-  "generators": {
-    "spec": false
-  },
-  "paths": {
-    "@repo/config-backend": ["../../packages/backend-dependencies"],
-    "@repo/config-backend-dev": ["../../packages/backend-dev-dependencies"],
-    "@repo/database": ["../../packages/database"]
+  "generateOptions": {
+    "spec": false,
+    "baseDir": "modules"
   }
 }

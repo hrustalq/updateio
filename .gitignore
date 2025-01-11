@@ -5,7 +5,12 @@ node_modules
 .pnp
 .pnp.js
 
+# Environment variables
+.env
 .env.local
+.env.*.local
+
+# Development
 .env.development.local
 .env.test.local
 .env.production.local
@@ -44,6 +49,7 @@ yarn-error.log*
 
 # Infrastructure
 infrastructure/docker/.env
+!infrastructure/docker/.env.example
 infrastructure/local/*
 !infrastructure/local/.gitkeep
 

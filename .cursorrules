@@ -15,7 +15,7 @@ Applications:
 
 Entities (models):
   - User
-  - Subscription (eg. user subscription to game updates)
+  - Subscription (eg. user subscriptions for game updates)
   - Game (eg. CS:GO, Valorant, etc.)
   - Game Provider (eg. Steam, Epic Games, etc.)
   - Update (eg. new update, patch notes, etc.)

@@ -7,30 +7,134 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Game {
+model GameProvider {
   id          String   @id @default(cuid())
   name        String
   description String?
+
+  imageUrl String?
+
+  games Game[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Game {
+  id          String   @id @default(cuid())
+
+  name        String
+  description String?
+  imageUrl    String?
+
+  externalId String?
+
+  providerId String
+  provider GameProvider @relation(fields: [providerId], references: [id])
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   updates GameUpdate[]
+  subscriptions UserSubscription[]
+  updateCommand UpdateCommand?
+
+  @@index([providerId])
 }
+
 model GameUpdate {
   id        String   @id @default(cuid())
-  version   String
-  content   String
+  version   String?
+  content   String?
+
   gameId    String
+  game Game @relation(fields: [gameId], references: [id])
+
+  notifications Notification[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  game Game @relation(fields: [gameId], references: [id])
+  @@index([gameId])
+  @@index([createdAt])
 }
 
 model User {
   id           String   @id @default(cuid())
   telegramId   String?  @unique
-  discordId    String?  @unique
+
+  subscriptions UserSubscription[]
+  notifications Notification[]
+  reports Report[]
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 } 
+
+model UserSubscription {
+  id        String   @id @default(cuid())
+
+  userId    String
+  user User @relation(fields: [userId], references: [id])
+
+  gameId String
+  game Game @relation(fields: [gameId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([gameId])
+}
+
+enum NotificationType {
+  UPDATE
+  REPORT
+  WARNING
+  ERROR
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+
+  userId    String
+  user User @relation(fields: [userId], references: [id])
+
+  gameUpdateId String
+  gameUpdate GameUpdate @relation(fields: [gameUpdateId], references: [id])
+
+  type NotificationType @default(UPDATE)
+  content String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([gameUpdateId])
+}
+
+model Report {
+  id        String   @id @default(cuid())
+
+  userId    String
+  user User @relation(fields: [userId], references: [id])
+
+  content   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UpdateCommand {
+  id        String   @id @default(cuid())
+
+  gameId String? @unique
+  game Game? @relation(fields: [gameId], references: [id])
+
+  command String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([gameId])
+}
