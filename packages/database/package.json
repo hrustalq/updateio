@@ -1,0 +1,35 @@
+{
+  "name": "@repo/database",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "prisma generate && tsup --tsconfig tsconfig.build.json",
+    "clean": "rm -rf .turbo node_modules dist",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push --skip-generate",
+    "db:migrate:dev": "prisma migrate dev",
+    "dev": "tsup --watch",
+    "format": "prisma format",
+    "lint": "eslint . --max-warnings 0",
+    "studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.10.2"
+  },
+  "devDependencies": {
+    "@repo/eslint-config-common": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^20.11.24",
+    "eslint": "^8.57.0",
+    "prisma": "^5.10.2",
+    "tsup": "^8.0.2",
+    "typescript": "5.5.4"
+  },
+  "packageManager": "pnpm@8.15.6"
+} 

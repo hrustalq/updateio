@@ -1,5 +1,5 @@
 {
-  "name": "@repo/eslint-config",
+  "name": "@repo/eslint-config-common",
   "version": "0.0.0",
   "private": true,
   "files": [
@@ -14,6 +14,10 @@
     "eslint-plugin-only-warn": "^1.1.0",
     "@typescript-eslint/parser": "^7.1.0",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
-    "typescript": "5.5.4"
+    "eslint": "^8.57.0",
+    "typescript": "^5.5.4"
+  },
+  "peerDependencies": {
+    "eslint": "^8.57.0"
   }
 }
