@@ -33,6 +33,10 @@
       "cache": false,
       "persistent": true
     },
+    "db:migrate:dev": {
+      "cache": false,
+      "persistent": true
+    },
     "db:push": {
       "cache": false,
       "persistent": true

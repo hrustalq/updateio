@@ -22,6 +22,7 @@ import { CacheModule } from './common/modules/cache/cache.module';
 import { AuthModule } from './domains/auth/auth.module';
 import { GlobalAuthGuard } from './common/guards/global-auth.guard';
 import { PrismaModule } from './common/modules/prisma/prisma.module';
+import { GameProvidersModule } from './domains/game-providers/game-providers.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { PrismaModule } from './common/modules/prisma/prisma.module';
     }),
     PrismaModule,
     CacheModule,
+    GameProvidersModule,
     AuthModule,
   ],
   providers: [

@@ -12,8 +12,9 @@
     "infra:clean": "docker compose -f infrastructure/docker/docker-compose.yml --env-file infrastructure/docker/.env down -v",
     "infra:logs": "docker compose -f infrastructure/docker/docker-compose.yml --env-file infrastructure/docker/.env logs -f",
     "db:generate": "turbo run db:generate --filter=@repo/database",
+    "db:migrate:dev": "turbo run db:migrate:dev --filter=@repo/database",
     "db:push": "turbo run db:push --filter=@repo/database",
-    "db:studio": "pnpm --filter @repo/database studio"
+    "db:studio": "turbo run db:studio --filter=@repo/database"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
