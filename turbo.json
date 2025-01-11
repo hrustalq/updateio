@@ -4,9 +4,22 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"],
-      "env": ["API_URL"]
+      "outputs": ["dist/**", ".next/**"],
+      "env": ["API_URL", "DATABASE_URL", "NODE_ENV"]
+    },
+    "build:packages": {
+      "outputs": ["dist/**"],
+      "cache": true
+    },
+    "build:api": {
+      "dependsOn": ["build:packages"],
+      "outputs": ["dist/**"],
+      "cache": true
+    },
+    "build:web": {
+      "dependsOn": ["build:packages"],
+      "outputs": [".next/**"],
+      "cache": true
     },
     "lint": {
       "dependsOn": ["^lint"]

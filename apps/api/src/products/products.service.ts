@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { CreateProductRequest, Product } from '@repo/types';
+import { prisma } from '@repo/database';
+import { CreateProductRequest } from '@repo/types';
 
 @Injectable()
 export class ProductsService {
-  private readonly products: Product[] = [];
-
-  createProduct(createProductRequest: CreateProductRequest) {
-    const product: Product = {
-      ...createProductRequest,
-      id: Math.random().toString(36).substring(7),
-    };
-    this.products.push(product);
+  async createProduct(data: CreateProductRequest) {
+    // Use prisma client
+    const product = await prisma.game.create({
+      data: {
+        name: data.name,
+        // ... other fields
+      },
+    });
     return product;
   }
-
-  getProducts() {
-    return this.products;
+  async getProducts() {
+    return prisma.game.findMany();
   }
 }

@@ -2,9 +2,75 @@ This project stands for updating games for clients.
 It provides several features:
   - Monitoring discord for game updates and sending them to the api for future use
   - User notifications for game updates in telegram
+  - Automatic game updates for clients (will be implemented in other app in separate repo)
+  - Subscription system for clients (will be implemented at api layer)
 
 Applications:
 
   - Api - NestJS application for handling game updates and user notifications
   - Discord bot - Discord bot for monitoring discord for game updates and sending them to the api
   - Telegram bot - Telegram bot for sending user notifications
+  - Admin panel - Admin panel for managing users, subscriptions, games, etc.
+  - Telegram mini app - Telegram mini app for managing user subscriptions
+
+Entities (models):
+  - User
+  - Subscription (eg. user subscription to game updates)
+  - Game (eg. CS:GO, Valorant, etc.)
+  - Game Provider (eg. Steam, Epic Games, etc.)
+  - Update (eg. new update, patch notes, etc.)
+  - Notification (eg. telegram)
+  - Update settings (eg. update frequency, update type, etc.)
+  - Update command (eg. /update, steam cli command, etc.)
+  - Report (eg. report for game updates)
+
+Technologies:
+
+  Api:
+    - NestJS
+    - TypeScript
+    - tRPC
+    - zod
+    - Prisma (distributed as turborepo package)
+    - PostgreSQL (accessible via docker)
+    - Redis (accessible via docker)
+    - RabbitMQ (accessible via docker)
+    - Grafana (accessible via docker)
+    - Loki (accessible via docker)
+    - Promtail (accessible via docker)
+
+  Discord bot:
+    - discord.js
+    - TypeScript
+    - tRPC
+    - zod
+
+  Telegram bot:
+    - Telegraf
+    - TypeScript
+    - tRPC
+    - zod
+
+  Admin panel:
+    - React
+    - Vite
+    - TypeScript
+    - tRPC
+    - zod
+
+  Telegram mini app:
+    - React
+    - Vite
+    - TypeScript
+    - tRPC
+    - zod
+
+Good to know:
+  - Project uses turborepo monorepo
+  - Project uses pnpm as package manager
+  - Project uses TypeScript
+  - Project uses ESLint
+  - Project uses Prettier
+  - Project uses TailwindCSS
+  - Project uses Radix UI
+  - Project uses Shadcn UI

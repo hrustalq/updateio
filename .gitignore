@@ -41,3 +41,16 @@ yarn-error.log*
 # IDE
 .vscode/
 .idea/
+
+# Infrastructure
+infrastructure/docker/.env
+infrastructure/local/*
+!infrastructure/local/.gitkeep
+
+# Misc
+.cursorrules
+
+# Prisma
+packages/database/node_modules
+packages/database/.env
+packages/database/dist

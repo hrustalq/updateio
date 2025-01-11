@@ -7,5 +7,10 @@
   },
   "generators": {
     "spec": false
+  },
+  "paths": {
+    "@repo/config-backend": ["../../packages/backend-dependencies"],
+    "@repo/config-backend-dev": ["../../packages/backend-dev-dependencies"],
+    "@repo/database": ["../../packages/database"]
   }
 }
