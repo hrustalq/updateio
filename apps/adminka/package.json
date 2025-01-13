@@ -10,11 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.3.4",
     "@repo/types": "workspace:*",
     "@repo/ui": "workspace:*",
+    "@tanstack/react-query": "^5.64.0",
     "@tanstack/react-router": "^1.95.5",
+    "axios": "^1.7.9",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.50.0",
     "zustand": "^4.5.0"
   },
   "devDependencies": {

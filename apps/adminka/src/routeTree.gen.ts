@@ -13,6 +13,14 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as UsersImport } from './routes/users'
+import { Route as UpdatesImport } from './routes/updates'
+import { Route as UnauthorizedImport } from './routes/unauthorized'
+import { Route as SettingsImport } from './routes/settings'
+import { Route as MessagesImport } from './routes/messages'
+import { Route as LoginImport } from './routes/login'
+import { Route as GamesImport } from './routes/games'
+import { Route as GameProvidersImport } from './routes/game-providers'
 
 // Create Virtual Routes
 
@@ -26,6 +34,54 @@ const AboutLazyRoute = AboutLazyImport.update({
   path: '/about',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
+
+const UsersRoute = UsersImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const UpdatesRoute = UpdatesImport.update({
+  id: '/updates',
+  path: '/updates',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const UnauthorizedRoute = UnauthorizedImport.update({
+  id: '/unauthorized',
+  path: '/unauthorized',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SettingsRoute = SettingsImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const MessagesRoute = MessagesImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LoginRoute = LoginImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GamesRoute = GamesImport.update({
+  id: '/games',
+  path: '/games',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GameProvidersRoute = GameProvidersImport.update({
+  id: '/game-providers',
+  path: '/game-providers',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexLazyRoute = IndexLazyImport.update({
   id: '/',
@@ -44,6 +100,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyImport
       parentRoute: typeof rootRoute
     }
+    '/game-providers': {
+      id: '/game-providers'
+      path: '/game-providers'
+      fullPath: '/game-providers'
+      preLoaderRoute: typeof GameProvidersImport
+      parentRoute: typeof rootRoute
+    }
+    '/games': {
+      id: '/games'
+      path: '/games'
+      fullPath: '/games'
+      preLoaderRoute: typeof GamesImport
+      parentRoute: typeof rootRoute
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/messages': {
+      id: '/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof MessagesImport
+      parentRoute: typeof rootRoute
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsImport
+      parentRoute: typeof rootRoute
+    }
+    '/unauthorized': {
+      id: '/unauthorized'
+      path: '/unauthorized'
+      fullPath: '/unauthorized'
+      preLoaderRoute: typeof UnauthorizedImport
+      parentRoute: typeof rootRoute
+    }
+    '/updates': {
+      id: '/updates'
+      path: '/updates'
+      fullPath: '/updates'
+      preLoaderRoute: typeof UpdatesImport
+      parentRoute: typeof rootRoute
+    }
+    '/users': {
+      id: '/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersImport
+      parentRoute: typeof rootRoute
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -58,36 +170,107 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
+  '/game-providers': typeof GameProvidersRoute
+  '/games': typeof GamesRoute
+  '/login': typeof LoginRoute
+  '/messages': typeof MessagesRoute
+  '/settings': typeof SettingsRoute
+  '/unauthorized': typeof UnauthorizedRoute
+  '/updates': typeof UpdatesRoute
+  '/users': typeof UsersRoute
   '/about': typeof AboutLazyRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
+  '/game-providers': typeof GameProvidersRoute
+  '/games': typeof GamesRoute
+  '/login': typeof LoginRoute
+  '/messages': typeof MessagesRoute
+  '/settings': typeof SettingsRoute
+  '/unauthorized': typeof UnauthorizedRoute
+  '/updates': typeof UpdatesRoute
+  '/users': typeof UsersRoute
   '/about': typeof AboutLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
+  '/game-providers': typeof GameProvidersRoute
+  '/games': typeof GamesRoute
+  '/login': typeof LoginRoute
+  '/messages': typeof MessagesRoute
+  '/settings': typeof SettingsRoute
+  '/unauthorized': typeof UnauthorizedRoute
+  '/updates': typeof UpdatesRoute
+  '/users': typeof UsersRoute
   '/about': typeof AboutLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths:
+    | '/'
+    | '/game-providers'
+    | '/games'
+    | '/login'
+    | '/messages'
+    | '/settings'
+    | '/unauthorized'
+    | '/updates'
+    | '/users'
+    | '/about'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to:
+    | '/'
+    | '/game-providers'
+    | '/games'
+    | '/login'
+    | '/messages'
+    | '/settings'
+    | '/unauthorized'
+    | '/updates'
+    | '/users'
+    | '/about'
+  id:
+    | '__root__'
+    | '/'
+    | '/game-providers'
+    | '/games'
+    | '/login'
+    | '/messages'
+    | '/settings'
+    | '/unauthorized'
+    | '/updates'
+    | '/users'
+    | '/about'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
+  GameProvidersRoute: typeof GameProvidersRoute
+  GamesRoute: typeof GamesRoute
+  LoginRoute: typeof LoginRoute
+  MessagesRoute: typeof MessagesRoute
+  SettingsRoute: typeof SettingsRoute
+  UnauthorizedRoute: typeof UnauthorizedRoute
+  UpdatesRoute: typeof UpdatesRoute
+  UsersRoute: typeof UsersRoute
   AboutLazyRoute: typeof AboutLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
+  GameProvidersRoute: GameProvidersRoute,
+  GamesRoute: GamesRoute,
+  LoginRoute: LoginRoute,
+  MessagesRoute: MessagesRoute,
+  SettingsRoute: SettingsRoute,
+  UnauthorizedRoute: UnauthorizedRoute,
+  UpdatesRoute: UpdatesRoute,
+  UsersRoute: UsersRoute,
   AboutLazyRoute: AboutLazyRoute,
 }
 
@@ -102,11 +285,43 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/game-providers",
+        "/games",
+        "/login",
+        "/messages",
+        "/settings",
+        "/unauthorized",
+        "/updates",
+        "/users",
         "/about"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
+    },
+    "/game-providers": {
+      "filePath": "game-providers.tsx"
+    },
+    "/games": {
+      "filePath": "games.tsx"
+    },
+    "/login": {
+      "filePath": "login.tsx"
+    },
+    "/messages": {
+      "filePath": "messages.tsx"
+    },
+    "/settings": {
+      "filePath": "settings.tsx"
+    },
+    "/unauthorized": {
+      "filePath": "unauthorized.tsx"
+    },
+    "/updates": {
+      "filePath": "updates.tsx"
+    },
+    "/users": {
+      "filePath": "users.tsx"
     },
     "/about": {
       "filePath": "about.lazy.tsx"
