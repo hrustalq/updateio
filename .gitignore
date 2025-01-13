@@ -29,22 +29,33 @@ coverage
 out/
 build
 dist
-
+dist-ssr
+*.local
 
 # Debug
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
 # Misc
 .DS_Store
 *.pem
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # Npm 
 .npmrc
 
 # IDE
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 .idea/
 
 # Infrastructure
