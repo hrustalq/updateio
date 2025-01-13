@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Request } from 'express';
 import { PaginatedResponse } from '../interfaces/pagination.interface';
 import { Logger } from '../services/logger.service';
 
@@ -15,12 +14,29 @@ export class MetadataInterceptor<T>
   implements NestInterceptor<T, PaginatedResponse<T>>
 {
   private readonly logger = new Logger('MetadataInterceptor');
+  private readonly staticFileExtensions = [
+    '.json',
+    '.html',
+    '.js',
+    '.css',
+    '.ico',
+  ];
+
+  private isStaticFile(path: string): boolean {
+    return this.staticFileExtensions.some((ext) => path.endsWith(ext));
+  }
 
   intercept(
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<PaginatedResponse<T>> {
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest();
+
+    // Skip metadata processing for static files
+    if (this.isStaticFile(request.path)) {
+      return next.handle();
+    }
+
     const host = request.get('host');
     const protocol = request.protocol;
 
@@ -56,7 +72,7 @@ export class MetadataInterceptor<T>
               ...response.metadata,
               timestamp: new Date().toISOString(),
               path: fullPath,
-              version: request.version,
+              version: request.version || 'unknown',
             },
           };
         }
@@ -67,7 +83,7 @@ export class MetadataInterceptor<T>
           metadata: {
             timestamp: new Date().toISOString(),
             path: fullPath,
-            version: request.version,
+            version: request.version || 'unknown',
           },
         };
       }),

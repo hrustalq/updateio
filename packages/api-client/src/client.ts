@@ -26,8 +26,12 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true
 
       try {
-        const response = await apiClient.post<paths['/auth/refresh']['post']['responses']['200']['content']['application/json']>('/auth/refresh')
-        const { accessToken } = response.data
+        const response = await apiClient.post<paths['/auth/refresh']['post']['responses']['201']['content']['application/json']>('/auth/refresh')
+        const { data } = response.data
+        if (!data) {
+          throw new Error('No data returned from refresh endpoint')
+        }
+        const { access_token: accessToken } = data
 
         useAuthStore.getState().setAccessToken(accessToken)
         originalRequest.headers.Authorization = `Bearer ${accessToken}`
@@ -99,17 +103,17 @@ export const games = {
   },
 
   getById: async (id: string) => {
-    const response = await apiClient.get<paths['/v1/games/{id}']['get']['responses']['200']['content']['application/json']>(`/v1/games/${id}`)
+    const response = await apiClient.get<paths['/games/{id}']['get']['responses']['200']['content']['application/json']>(`/v1/games/${id}`)
     return response.data
   },
 
-  create: async (data: paths['/v1/games']['post']['requestBody']['content']['application/json']) => {
-    const response = await apiClient.post<paths['/v1/games']['post']['responses']['201']['content']['application/json']>('/v1/games', data)
+  create: async (data: paths['/games']['post']['requestBody']['content']['application/json']) => {
+    const response = await apiClient.post<paths['/games']['post']['responses']['201']['content']['application/json']>('/games', data)
     return response.data
   },
 
-  update: async (id: string, data: paths['/v1/games/{id}']['patch']['requestBody']['content']['application/json']) => {
-    const response = await apiClient.patch<paths['/v1/games/{id}']['patch']['responses']['200']['content']['application/json']>(`/v1/games/${id}`, data)
+  update: async (id: string, data: paths['/games/{id}']['patch']['requestBody']['content']['application/json']) => {
+    const response = await apiClient.patch<paths['/games/{id}']['patch']['responses']['200']['content']['application/json']>(`/games/${id}`, data)
     return response.data
   },
 
@@ -118,28 +122,51 @@ export const games = {
   },
 }
 
-// Updates endpoints
-export const updates = {
-  getAll: async (params?: paths['/v1/updates']['get']['parameters']['query']) => {
-    const response = await apiClient.get<paths['/v1/updates']['get']['responses']['200']['content']['application/json']>('/v1/updates', { params })
+// Notifications endpoints
+export const notifications = {
+  getAll: async (params?: paths['/notifications']['get']['parameters']['query']) => {
+    const response = await apiClient.get<paths['/notifications']['get']['responses']['200']['content']['application/json']>('/notifications', { params })
     return response.data
   },
 
   getById: async (id: string) => {
-    const response = await apiClient.get<paths['/v1/updates/{id}']['get']['responses']['200']['content']['application/json']>(`/v1/updates/${id}`)
+    const response = await apiClient.get<paths['/notifications/{id}']['get']['responses']['200']['content']['application/json']>(`/notifications/${id}`)
     return response.data
+  },
+
+  create: async (data: paths['/notifications']['post']['requestBody']['content']['application/json']) => {
+    const response = await apiClient.post<paths['/notifications']['post']['responses']['201']['content']['application/json']>('/notifications', data)
+    return response.data
+  },
+
+  update: async (id: string, data: paths['/notifications/{id}']['patch']['requestBody']['content']['application/json']) => {
+    const response = await apiClient.patch<paths['/notifications/{id}']['patch']['responses']['200']['content']['application/json']>(`/notifications/${id}`, data)
+    return response.data
+  },
+
+  delete: async (id: string) => {
+    await apiClient.delete(`/v1/notifications/${id}`)
   },
 }
 
-// Settings endpoints
-export const settings = {
-  get: async () => {
-    const response = await apiClient.get<paths['/v1/settings']['get']['responses']['200']['content']['application/json']>('/v1/settings')
+// Update commands endpoints
+export const updateCommands = {
+  getAll: async (params?: paths['/update-commands']['get']['parameters']['query']) => {
+    const response = await apiClient.get<paths['/update-commands']['get']['responses']['200']['content']['application/json']>('/update-commands', { params })
     return response.data
   },
 
-  update: async (data: paths['/v1/settings']['patch']['requestBody']['content']['application/json']) => {
-    const response = await apiClient.patch<paths['/v1/settings']['patch']['responses']['200']['content']['application/json']>('/v1/settings', data)
+  create: async (data: paths['/update-commands']['post']['requestBody']['content']['application/json']) => {
+    const response = await apiClient.post<paths['/update-commands']['post']['responses']['201']['content']['application/json']>('/update-commands', data)
     return response.data
   },
-} 
+
+  update: async (id: string, data: paths['/update-commands/{id}']['patch']['requestBody']['content']['application/json']) => {
+    const response = await apiClient.patch<paths['/update-commands/{id}']['patch']['responses']['200']['content']['application/json']>(`/update-commands/${id}`, data)
+    return response.data
+  },
+
+  delete: async (id: string) => {
+    await apiClient.delete(`/v1/update-commands/${id}`)
+  },
+}

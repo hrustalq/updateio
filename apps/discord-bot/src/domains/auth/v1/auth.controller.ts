@@ -5,16 +5,29 @@ import { ApiTags, ApiOperation, ApiCookieAuth, ApiBody } from '@nestjs/swagger';
 import { ApiResponse } from '../../../common/decorators/api-response.decorator';
 import { JwtDto } from './dto/jwt.dto';
 import { GetUser } from '../../../common/decorators/user.decorator';
-import { User } from '../../users/v1/interfaces/user.interface';
-import { MessageResponseDto } from 'src/common/dto/message-response.dto';
+import { MessageResponseDto } from '../../../common/dto/message-response.dto';
 import { TokenVerificationDto } from './dto/token-verification.dto';
 import { Auth, AuthType } from '../../../common/decorators/auth.decorator';
 import { LoginDto } from './dto/local-auth.dto';
+import { UserResponseDto } from './dto/user-response.dto';
+import { User } from '@repo/database';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @ApiOperation({ summary: 'Get current user information' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns the current user information',
+    type: UserResponseDto,
+  })
+  @Auth({ type: AuthType.Bearer })
+  @Get('me')
+  async getCurrentUser(@GetUser() user: User): Promise<UserResponseDto> {
+    return this.authService.getCurrentUser(user);
+  }
 
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({

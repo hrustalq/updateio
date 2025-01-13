@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth.service';
 import { JwtPayload } from '../interfaces/jwt-payload.intrerface';
 import { Request } from 'express';
-import { UsersService } from '../../../users/v1/users.service';
+import { UsersV1Service as UsersService } from '../../../users/v1/users.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -34,7 +34,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
 
-    const user = await this.usersService.findById(payload.id);
+    const user = await this.usersService.findOne(payload.id);
     if (!user) {
       throw new UnauthorizedException();
     }
@@ -42,8 +42,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     // Attach user to request
     req.user = {
       id: user.id,
-      email: user.email,
+      telegramId: user.telegramId,
       role: user.role,
+      password: user.password,
     };
 
     return req.user;

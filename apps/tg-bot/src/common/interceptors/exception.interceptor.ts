@@ -17,15 +17,32 @@ import { Logger } from '../services/logger.service';
 export class ExceptionInterceptor implements NestInterceptor {
   private readonly logger = new Logger('ExceptionHandler');
 
+  private readonly staticFileExtensions = [
+    '.json',
+    '.html',
+    '.js',
+    '.css',
+    '.ico',
+  ];
+  private isStaticFile(path: string): boolean {
+    return this.staticFileExtensions.some((ext) => path.endsWith(ext));
+  }
+
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest<Request>();
+
+    // Skip metadata processing for static files
+    if (this.isStaticFile(request.path)) {
+      return next.handle();
+    }
+
     const host = request.get('host');
     const protocol = request.protocol;
     const routePath = request.route?.path || '';
     const method = request.method;
     const userAgent = request.get('user-agent') || '';
     const ip = request.ip;
-    const version = request.version || '1';
+    const version = '1'; // Default to version 1 if not specified
 
     const fullPath = `${protocol}://${host}${routePath}`.replace(/\/+/g, '/');
 

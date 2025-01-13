@@ -42,8 +42,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     // Attach user to request
     req.user = {
       id: user.id,
-      email: user.email,
+      telegramId: user.telegramId,
       role: user.role,
+      password: user.password,
     };
 
     return req.user;

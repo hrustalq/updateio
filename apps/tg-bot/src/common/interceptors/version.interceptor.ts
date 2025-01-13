@@ -5,20 +5,41 @@ import {
   CallHandler,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { Request } from 'express';
 import 'reflect-metadata';
+import { CustomRequest } from '../types/request.types';
 
 @Injectable()
 export class VersionInterceptor implements NestInterceptor {
+  private readonly staticFileExtensions = [
+    '.json',
+    '.html',
+    '.js',
+    '.css',
+    '.ico',
+  ];
+
+  private isStaticFile(path: string): boolean {
+    return this.staticFileExtensions.some((ext) => path.endsWith(ext));
+  }
+
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest<CustomRequest>();
+
+    // Skip version processing for static files
+    if (this.isStaticFile(request.path)) {
+      return next.handle();
+    }
+
     const version = this.extractVersion(request, context);
     request.version = version;
 
     return next.handle();
   }
 
-  private extractVersion(request: Request, context: ExecutionContext): string {
+  private extractVersion(
+    request: CustomRequest,
+    context: ExecutionContext,
+  ): string {
     // Try to get version from controller metadata
     const controller = context.getClass();
     const routeVersion = Reflect.getMetadata('version', controller);

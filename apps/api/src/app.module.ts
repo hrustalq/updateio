@@ -23,6 +23,11 @@ import { AuthModule } from './domains/auth/auth.module';
 import { GlobalAuthGuard } from './common/guards/global-auth.guard';
 import { PrismaModule } from './common/modules/prisma/prisma.module';
 import { GameProvidersModule } from './domains/game-providers/game-providers.module';
+import { GamesModule } from './domains/games/games.module';
+import { SubscriptionsModule } from './domains/subscriptions/subscriptions.module';
+import { NotificationsModule } from './domains/notifications/notifications.module';
+import { ReportsModule } from './domains/reports/reports.module';
+import { UpdateCommandsModule } from './domains/update-commands/update-commands.module';
 
 @Module({
   imports: [
@@ -37,6 +42,11 @@ import { GameProvidersModule } from './domains/game-providers/game-providers.mod
     CacheModule,
     GameProvidersModule,
     AuthModule,
+    GamesModule,
+    SubscriptionsModule,
+    NotificationsModule,
+    ReportsModule,
+    UpdateCommandsModule,
   ],
   providers: [
     {

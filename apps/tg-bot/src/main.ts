@@ -23,6 +23,17 @@ async function bootstrap() {
   /** Initializing custom logger */
   app.useLogger(new CustomLogger('AppInstance'));
 
+  /** Cors */
+  const configService = app.get(ConfigService);
+  const allowedOrigins = configService.get<string>('CORS_ORIGIN');
+
+  app.enableCors({
+    origin: (requestOrigin, callback) => {
+      callback(null, allowedOrigins.includes(requestOrigin));
+    },
+    credentials: true,
+  });
+
   /** Versioning */
   app.enableVersioning({
     type: VersioningType.URI,
@@ -39,7 +50,6 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
 
   /** Initializing app config using environment variables & nestjs/config */
-  const configService = app.get(ConfigService);
   const port = parseInt(configService.get<string>('PORT'), 10);
   const host = configService.get<string>('HOST');
 

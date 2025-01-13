@@ -14,17 +14,34 @@ import { Logger } from '../services/logger.service';
 export class HttpCacheInterceptor {
   private readonly logger = new Logger('CacheInterceptor');
   private readonly WRITE_METHODS = ['POST', 'PUT', 'DELETE', 'PATCH'];
+  private readonly staticFileExtensions = [
+    '.json',
+    '.html',
+    '.js',
+    '.css',
+    '.ico',
+  ];
 
   constructor(
     private readonly cacheService: CacheService,
     private readonly reflector: Reflector,
   ) {}
 
+  private isStaticFile(path: string): boolean {
+    return this.staticFileExtensions.some((ext) => path.endsWith(ext));
+  }
+
   async intercept(
     context: ExecutionContext,
     next: CallHandler,
   ): Promise<Observable<any>> {
     const request = context.switchToHttp().getRequest();
+
+    // Skip cache processing for static files
+    if (this.isStaticFile(request.path)) {
+      return next.handle();
+    }
+
     const cacheOptions = this.reflector.get<CacheOptions>(
       CACHE_KEY_METADATA,
       context.getHandler(),

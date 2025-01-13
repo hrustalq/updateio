@@ -13,10 +13,10 @@ import { FindOneParamsDto } from '../common/dto/find-one-params.dto';
 import { SortingQueryDto } from '../common/dto/sorting-query.dto';
 
 export const swaggerConfig = new DocumentBuilder()
-  .setTitle('API Documentation')
+  .setTitle('Discord Bot API Documentation')
   .setDescription(
     [
-      'API documentation for the application.',
+      'API documentation for the Discord Bot.',
       '',
       'Download [swagger.json](/swagger.json)',
     ].join('\n'),

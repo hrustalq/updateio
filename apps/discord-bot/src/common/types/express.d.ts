@@ -1,9 +1,11 @@
-import { User } from '../../domains/users/v1/interfaces/user.interface';
+import { User } from '@repo/database';
 
 declare module 'express' {
-  interface Request {
+  export interface Request {
     version?: string;
-    user?: Omit<User, 'password'>;
+    user?: Omit<User, 'createdAt' | 'updatedAt'>;
     cookies: Record<string, any>;
   }
 }
+
+export {};

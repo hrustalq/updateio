@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { CacheService } from '../../../common/modules/cache/cache.service';
 import { TelegramAuthDto } from './dto/telegram-auth.dto';
 import { compare } from 'bcrypt';
-import { UsersService } from '../../users/v1/users.service';
+import { UsersV1Service as UsersService } from '../../users/v1/users.service';
 import { JwtPayload } from './interfaces/jwt-payload.intrerface';
 import { Tokens } from './interfaces/tokens.interface';
 import { Response } from 'express';
@@ -67,7 +67,7 @@ export class AuthService {
     refreshToken: string,
     res: Response,
   ): Promise<JwtDto> {
-    const user = await this.usersService.findById(userId);
+    const user = await this.usersService.findOne(userId);
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
@@ -164,7 +164,7 @@ export class AuthService {
   }
 
   async validateUser(email: string, password: string) {
-    const user = await this.usersService.findByEmail(email);
+    const user = await this.usersService.findOne(email);
     if (!user) {
       return null;
     }

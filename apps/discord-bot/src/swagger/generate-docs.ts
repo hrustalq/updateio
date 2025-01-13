@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { writeFileSync } from 'fs';
 import { join } from 'path';
 import { AppModule } from '../app.module';
 
@@ -8,31 +8,17 @@ async function generateDocs() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('API Documentation')
-    .setDescription(
-      [
-        'API documentation for the application.',
-        '',
-        'Download [swagger.json](/public/swagger.json)',
-      ].join('\n'),
-    )
+    .setTitle('UpdateIO Discord Bot')
+    .setDescription('The UpdateIO Discord Bot API description')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
+  const outputPath = join(process.cwd(), 'public', 'swagger.json');
 
-  // Ensure public/swagger directory exists
-  const swaggerPath = join(__dirname, '..', '..', 'public');
-  if (!existsSync(swaggerPath)) {
-    mkdirSync(swaggerPath, { recursive: true });
-  }
-
-  // Generate swagger.json
-  writeFileSync(
-    join(swaggerPath, 'swagger.json'),
-    JSON.stringify(document, null, 2),
-  );
+  writeFileSync(outputPath, JSON.stringify(document, null, 2));
+  console.log(`OpenAPI documentation generated at ${outputPath}`);
 
   await app.close();
 }

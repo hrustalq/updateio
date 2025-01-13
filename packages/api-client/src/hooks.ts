@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { auth, gameProviders, games, updates, settings } from './client'
+import { auth, gameProviders, games, notifications, updateCommands } from './client'
 
 // Auth hooks
 export const useLogin = () => {
@@ -90,30 +90,30 @@ export const useDeleteGame = () => {
 }
 
 // Updates hooks
-export const useUpdates = (params?: Parameters<typeof updates.getAll>[0]) => {
+export const useNotifications = (params?: Parameters<typeof notifications.getAll>[0]) => {
   return useQuery({
-    queryKey: ['updates', params],
-    queryFn: () => updates.getAll(params),
+    queryKey: ['notifications', params],
+    queryFn: () => notifications.getAll(params),
   })
 }
 
-export const useUpdate = (id: string) => {
+export const useNotification = (id: string) => {
   return useQuery({
-    queryKey: ['update', id],
-    queryFn: () => updates.getById(id),
+    queryKey: ['notification', id],
+    queryFn: () => notifications.getById(id),
   })
 }
 
 // Settings hooks
-export const useSettings = () => {
+export const useUpdateCommands = (params?: Parameters<typeof updateCommands.getAll>[0]) => {
   return useQuery({
-    queryKey: ['settings'],
-    queryFn: settings.get,
+    queryKey: ['updateCommands', params],
+    queryFn: () => updateCommands.getAll(params),
   })
 }
 
-export const useUpdateSettings = () => {
+export const useUpdateCommand = () => {
   return useMutation({
-    mutationFn: settings.update,
+    mutationFn: updateCommands.create,
   })
 } 

@@ -39,6 +39,94 @@ export interface paths {
     /** Verify access token */
     get: operations["AuthController_verify"];
   };
+  "/users": {
+    /** Get all users */
+    get: operations["UsersV1Controller_findAll"];
+    /** Create a new user */
+    post: operations["UsersV1Controller_create"];
+  };
+  "/users/telegram/{telegramId}": {
+    /** Get a user by telegram id */
+    get: operations["UsersV1Controller_findByTelegramId"];
+  };
+  "/users/{id}": {
+    /** Get a user by id */
+    get: operations["UsersV1Controller_findOne"];
+    /** Delete a user */
+    delete: operations["UsersV1Controller_remove"];
+    /** Update a user */
+    patch: operations["UsersV1Controller_update"];
+  };
+  "/games": {
+    /** Get all games */
+    get: operations["GamesV1Controller_findAll"];
+    /** Create a new game */
+    post: operations["GamesV1Controller_create"];
+  };
+  "/games/{id}": {
+    /** Get a game by id */
+    get: operations["GamesV1Controller_findOne"];
+    /** Delete a game */
+    delete: operations["GamesV1Controller_remove"];
+    /** Update a game */
+    patch: operations["GamesV1Controller_update"];
+  };
+  "/subscriptions": {
+    /** Get all subscriptions */
+    get: operations["SubscriptionsV1Controller_findAll"];
+    /** Create a new subscription */
+    post: operations["SubscriptionsV1Controller_create"];
+  };
+  "/subscriptions/{id}": {
+    /** Get a subscription by id */
+    get: operations["SubscriptionsV1Controller_findOne"];
+    /** Delete a subscription */
+    delete: operations["SubscriptionsV1Controller_remove"];
+    /** Update a subscription */
+    patch: operations["SubscriptionsV1Controller_update"];
+  };
+  "/notifications": {
+    /** Get all notifications */
+    get: operations["NotificationsV1Controller_findAll"];
+    /** Create a new notification */
+    post: operations["NotificationsV1Controller_create"];
+  };
+  "/notifications/{id}": {
+    /** Get a notification by id */
+    get: operations["NotificationsV1Controller_findOne"];
+    /** Delete a notification */
+    delete: operations["NotificationsV1Controller_remove"];
+    /** Update a notification */
+    patch: operations["NotificationsV1Controller_update"];
+  };
+  "/reports": {
+    /** Get all reports */
+    get: operations["ReportsV1Controller_findAll"];
+    /** Create a new report */
+    post: operations["ReportsV1Controller_create"];
+  };
+  "/reports/{id}": {
+    /** Get a report by id */
+    get: operations["ReportsV1Controller_findOne"];
+    /** Delete a report */
+    delete: operations["ReportsV1Controller_remove"];
+    /** Update a report */
+    patch: operations["ReportsV1Controller_update"];
+  };
+  "/update-commands": {
+    /** Get all update commands */
+    get: operations["UpdateCommandsV1Controller_findAll"];
+    /** Create a new update command */
+    post: operations["UpdateCommandsV1Controller_create"];
+  };
+  "/update-commands/{id}": {
+    /** Get an update command by id */
+    get: operations["UpdateCommandsV1Controller_findOne"];
+    /** Delete an update command */
+    delete: operations["UpdateCommandsV1Controller_remove"];
+    /** Update an update command */
+    patch: operations["UpdateCommandsV1Controller_update"];
+  };
 }
 
 export type webhooks = Record<string, never>;
@@ -177,6 +265,397 @@ export interface components {
        */
       expires_in: number;
     };
+    UserDto: {
+      /**
+       * @description The unique identifier of the user
+       * @example clrk2345600000123jk5678
+       */
+      id: string;
+      /**
+       * @description Telegram ID of the user
+       * @example 123456789
+       */
+      telegramId?: string;
+      /**
+       * @description User role
+       * @example USER
+       * @enum {string}
+       */
+      role: "ADMIN" | "MODERATOR" | "USER" | "CLIENT";
+      /**
+       * Format: date-time
+       * @description Creation timestamp
+       */
+      createdAt: string;
+      /**
+       * Format: date-time
+       * @description Last update timestamp
+       */
+      updatedAt: string;
+    };
+    CreateUserDto: {
+      /**
+       * @description Telegram ID of the user
+       * @example 123456789
+       */
+      telegramId?: string;
+      /** @description User password */
+      password?: string;
+      /**
+       * @description User role
+       * @example USER
+       * @enum {string}
+       */
+      role?: "ADMIN" | "MODERATOR" | "USER" | "CLIENT";
+    };
+    UpdateUserDto: {
+      /**
+       * @description Telegram ID of the user
+       * @example 123456789
+       */
+      telegramId?: string;
+      /** @description User password */
+      password?: string;
+      /**
+       * @description User role
+       * @example USER
+       * @enum {string}
+       */
+      role?: "ADMIN" | "MODERATOR" | "USER" | "CLIENT";
+    };
+    GameDto: {
+      /**
+       * @description The unique identifier of the game
+       * @example clrk2345600000123jk5678
+       */
+      id: string;
+      /**
+       * @description The name of the game
+       * @example Counter-Strike 2
+       */
+      name: string;
+      /**
+       * @description The description of the game
+       * @example Popular competitive first-person shooter game
+       */
+      description?: string;
+      /**
+       * @description URL to the game image
+       * @example https://example.com/cs2.jpg
+       */
+      imageUrl?: string;
+      /**
+       * @description External ID of the game (e.g. Steam App ID)
+       * @example 730
+       */
+      externalId?: string;
+      /**
+       * @description ID of the game provider
+       * @example clrk2345600000123jk5679
+       */
+      providerId: string;
+      /**
+       * Format: date-time
+       * @description Creation timestamp
+       */
+      createdAt: string;
+      /**
+       * Format: date-time
+       * @description Last update timestamp
+       */
+      updatedAt: string;
+    };
+    CreateGameDto: {
+      /**
+       * @description The name of the game
+       * @example Counter-Strike 2
+       */
+      name: string;
+      /**
+       * @description The description of the game
+       * @example Popular competitive first-person shooter game
+       */
+      description?: string;
+      /**
+       * @description URL to the game image
+       * @example https://example.com/cs2.jpg
+       */
+      imageUrl?: string;
+      /**
+       * @description External ID of the game (e.g. Steam App ID)
+       * @example 730
+       */
+      externalId?: string;
+      /**
+       * @description ID of the game provider
+       * @example clrk2345600000123jk5679
+       */
+      providerId: string;
+    };
+    UpdateGameDto: {
+      /**
+       * @description The name of the game
+       * @example Counter-Strike 2
+       */
+      name?: string;
+      /**
+       * @description The description of the game
+       * @example Popular competitive first-person shooter game
+       */
+      description?: string;
+      /**
+       * @description URL to the game image
+       * @example https://example.com/cs2.jpg
+       */
+      imageUrl?: string;
+      /**
+       * @description External ID of the game (e.g. Steam App ID)
+       * @example 730
+       */
+      externalId?: string;
+      /**
+       * @description ID of the game provider
+       * @example clrk2345600000123jk5679
+       */
+      providerId?: string;
+    };
+    SubscriptionDto: {
+      /**
+       * @description The unique identifier of the subscription
+       * @example clrk2345600000123jk5678
+       */
+      id: string;
+      /**
+       * @description ID of the user who subscribed
+       * @example clrk2345600000123jk5679
+       */
+      userId: string;
+      /**
+       * @description ID of the game subscribed to
+       * @example clrk2345600000123jk5680
+       */
+      gameId: string;
+      /**
+       * Format: date-time
+       * @description Creation timestamp
+       */
+      createdAt: string;
+      /**
+       * Format: date-time
+       * @description Last update timestamp
+       */
+      updatedAt: string;
+    };
+    CreateSubscriptionDto: {
+      /**
+       * @description ID of the user who subscribes
+       * @example clrk2345600000123jk5679
+       */
+      userId: string;
+      /**
+       * @description ID of the game to subscribe to
+       * @example clrk2345600000123jk5680
+       */
+      gameId: string;
+    };
+    UpdateSubscriptionDto: {
+      /**
+       * @description ID of the user who subscribes
+       * @example clrk2345600000123jk5679
+       */
+      userId?: string;
+      /**
+       * @description ID of the game to subscribe to
+       * @example clrk2345600000123jk5680
+       */
+      gameId?: string;
+    };
+    NotificationDto: {
+      /**
+       * @description The unique identifier of the notification
+       * @example clrk2345600000123jk5678
+       */
+      id: string;
+      /**
+       * @description ID of the user who receives the notification
+       * @example clrk2345600000123jk5679
+       */
+      userId: string;
+      /**
+       * @description ID of the game update this notification is about
+       * @example clrk2345600000123jk5680
+       */
+      gameUpdateId: string;
+      /**
+       * @description Type of notification
+       * @example UPDATE
+       * @enum {string}
+       */
+      type: "UPDATE" | "REPORT" | "WARNING" | "ERROR";
+      /**
+       * @description Content of the notification
+       * @example New update available for Counter-Strike 2
+       */
+      content?: string;
+      /**
+       * Format: date-time
+       * @description Creation timestamp
+       */
+      createdAt: string;
+      /**
+       * Format: date-time
+       * @description Last update timestamp
+       */
+      updatedAt: string;
+    };
+    CreateNotificationDto: {
+      /**
+       * @description ID of the user who receives the notification
+       * @example clrk2345600000123jk5679
+       */
+      userId: string;
+      /**
+       * @description ID of the game update this notification is about
+       * @example clrk2345600000123jk5680
+       */
+      gameUpdateId: string;
+      /**
+       * @description Type of notification
+       * @example UPDATE
+       * @enum {string}
+       */
+      type: "UPDATE" | "REPORT" | "WARNING" | "ERROR";
+      /**
+       * @description Content of the notification
+       * @example New update available for Counter-Strike 2
+       */
+      content?: string;
+    };
+    UpdateNotificationDto: {
+      /**
+       * @description ID of the user who receives the notification
+       * @example clrk2345600000123jk5679
+       */
+      userId?: string;
+      /**
+       * @description ID of the game update this notification is about
+       * @example clrk2345600000123jk5680
+       */
+      gameUpdateId?: string;
+      /**
+       * @description Type of notification
+       * @example UPDATE
+       * @enum {string}
+       */
+      type?: "UPDATE" | "REPORT" | "WARNING" | "ERROR";
+      /**
+       * @description Content of the notification
+       * @example New update available for Counter-Strike 2
+       */
+      content?: string;
+    };
+    ReportDto: {
+      /**
+       * @description The unique identifier of the report
+       * @example clrk2345600000123jk5678
+       */
+      id: string;
+      /**
+       * @description ID of the user who created the report
+       * @example clrk2345600000123jk5679
+       */
+      userId: string;
+      /**
+       * @description Content of the report
+       * @example Game update failed to install properly
+       */
+      content: string;
+      /**
+       * Format: date-time
+       * @description Creation timestamp
+       */
+      createdAt: string;
+      /**
+       * Format: date-time
+       * @description Last update timestamp
+       */
+      updatedAt: string;
+    };
+    CreateReportDto: {
+      /**
+       * @description ID of the user creating the report
+       * @example clrk2345600000123jk5679
+       */
+      userId: string;
+      /**
+       * @description Content of the report
+       * @example Game update failed to install properly
+       */
+      content: string;
+    };
+    UpdateReportDto: {
+      /**
+       * @description ID of the user creating the report
+       * @example clrk2345600000123jk5679
+       */
+      userId?: string;
+      /**
+       * @description Content of the report
+       * @example Game update failed to install properly
+       */
+      content?: string;
+    };
+    UpdateCommandDto: {
+      /**
+       * @description The unique identifier of the update command
+       * @example clrk2345600000123jk5678
+       */
+      id: string;
+      /**
+       * @description ID of the game this command is for
+       * @example clrk2345600000123jk5679
+       */
+      gameId?: string;
+      /**
+       * @description The command to execute for updating
+       * @example steamcmd +login anonymous +app_update 730 +quit
+       */
+      command: string;
+      /**
+       * Format: date-time
+       * @description Creation timestamp
+       */
+      createdAt: string;
+      /**
+       * Format: date-time
+       * @description Last update timestamp
+       */
+      updatedAt: string;
+    };
+    CreateUpdateCommandDto: {
+      /**
+       * @description ID of the game this command is for
+       * @example clrk2345600000123jk5679
+       */
+      gameId?: string;
+      /**
+       * @description The command to execute for updating
+       * @example steamcmd +login anonymous +app_update 730 +quit
+       */
+      command: string;
+    };
+    UpdateUpdateCommandDto: {
+      /**
+       * @description ID of the game this command is for
+       * @example clrk2345600000123jk5679
+       */
+      gameId?: string;
+      /**
+       * @description The command to execute for updating
+       * @example steamcmd +login anonymous +app_update 730 +quit
+       */
+      command?: string;
+    };
   };
   responses: never;
   parameters: never;
@@ -212,7 +691,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T18:54:01.132Z
+               * @example 2025-01-13T19:33:28.773Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -338,7 +817,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T18:54:01.132Z
+               * @example 2025-01-13T19:33:28.773Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -432,7 +911,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T18:54:01.132Z
+               * @example 2025-01-13T19:33:28.773Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -526,7 +1005,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T18:54:01.133Z
+               * @example 2025-01-13T19:33:28.773Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -625,7 +1104,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T18:54:01.132Z
+               * @example 2025-01-13T19:33:28.773Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -714,7 +1193,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T18:54:01.063Z
+               * @example 2025-01-13T19:33:28.709Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/me */
@@ -803,7 +1282,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T18:54:01.063Z
+               * @example 2025-01-13T19:33:28.709Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/refresh */
@@ -897,7 +1376,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T18:54:01.064Z
+               * @example 2025-01-13T19:33:28.709Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/login */
@@ -991,7 +1470,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T18:54:01.064Z
+               * @example 2025-01-13T19:33:28.710Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/logout */
@@ -1085,10 +1564,3143 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T18:54:01.064Z
+               * @example 2025-01-13T19:33:28.710Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/verify */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get all users */
+  UsersV1Controller_findAll: {
+    responses: {
+      /** @description Returns all users */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UserDto"][];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.728Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+              pagination?: {
+                /**
+                 * @description Total number of items
+                 * @example 100
+                 */
+                total?: number;
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description Items per page
+                 * @example 10
+                 */
+                limit?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 10
+                 */
+                totalPages?: number;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPreviousPage?: boolean;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNextPage?: boolean;
+              };
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Create a new user */
+  UsersV1Controller_create: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateUserDto"];
+      };
+    };
+    responses: {
+      /** @description Successful response with metadata */
+      201: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UserDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.728Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get a user by telegram id */
+  UsersV1Controller_findByTelegramId: {
+    parameters: {
+      path: {
+        telegramId: string;
+      };
+    };
+    responses: {
+      /** @description Returns the user */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UserDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.728Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get a user by id */
+  UsersV1Controller_findOne: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Returns the user */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UserDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.728Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Delete a user */
+  UsersV1Controller_remove: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description The user has been successfully deleted. */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UserDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.728Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Update a user */
+  UsersV1Controller_update: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateUserDto"];
+      };
+    };
+    responses: {
+      /** @description The user has been successfully updated. */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UserDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.728Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get all games */
+  GamesV1Controller_findAll: {
+    parameters: {
+      query: {
+        providerId: string;
+      };
+    };
+    responses: {
+      /** @description Returns all games */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["GameDto"][];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.797Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+              pagination?: {
+                /**
+                 * @description Total number of items
+                 * @example 100
+                 */
+                total?: number;
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description Items per page
+                 * @example 10
+                 */
+                limit?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 10
+                 */
+                totalPages?: number;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPreviousPage?: boolean;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNextPage?: boolean;
+              };
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Create a new game */
+  GamesV1Controller_create: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateGameDto"];
+      };
+    };
+    responses: {
+      /** @description Successful response with metadata */
+      201: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["GameDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.797Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get a game by id */
+  GamesV1Controller_findOne: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Returns the game */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["GameDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.797Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Delete a game */
+  GamesV1Controller_remove: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description The game has been successfully deleted. */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["GameDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.797Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Update a game */
+  GamesV1Controller_update: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateGameDto"];
+      };
+    };
+    responses: {
+      /** @description The game has been successfully updated. */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["GameDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.797Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get all subscriptions */
+  SubscriptionsV1Controller_findAll: {
+    parameters: {
+      query: {
+        userId: string;
+        gameId: string;
+      };
+    };
+    responses: {
+      /** @description Returns all subscriptions */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["SubscriptionDto"][];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.818Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+              pagination?: {
+                /**
+                 * @description Total number of items
+                 * @example 100
+                 */
+                total?: number;
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description Items per page
+                 * @example 10
+                 */
+                limit?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 10
+                 */
+                totalPages?: number;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPreviousPage?: boolean;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNextPage?: boolean;
+              };
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Create a new subscription */
+  SubscriptionsV1Controller_create: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateSubscriptionDto"];
+      };
+    };
+    responses: {
+      /** @description Successful response with metadata */
+      201: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["SubscriptionDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.818Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get a subscription by id */
+  SubscriptionsV1Controller_findOne: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Returns the subscription */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["SubscriptionDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.818Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Delete a subscription */
+  SubscriptionsV1Controller_remove: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description The subscription has been successfully deleted. */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["SubscriptionDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.818Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Update a subscription */
+  SubscriptionsV1Controller_update: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateSubscriptionDto"];
+      };
+    };
+    responses: {
+      /** @description The subscription has been successfully updated. */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["SubscriptionDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.818Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get all notifications */
+  NotificationsV1Controller_findAll: {
+    parameters: {
+      query: {
+        userId: string;
+        type: string;
+      };
+    };
+    responses: {
+      /** @description Returns all notifications */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["NotificationDto"][];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.843Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+              pagination?: {
+                /**
+                 * @description Total number of items
+                 * @example 100
+                 */
+                total?: number;
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description Items per page
+                 * @example 10
+                 */
+                limit?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 10
+                 */
+                totalPages?: number;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPreviousPage?: boolean;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNextPage?: boolean;
+              };
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Create a new notification */
+  NotificationsV1Controller_create: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateNotificationDto"];
+      };
+    };
+    responses: {
+      /** @description Successful response with metadata */
+      201: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["NotificationDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.843Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get a notification by id */
+  NotificationsV1Controller_findOne: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Returns the notification */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["NotificationDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.843Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Delete a notification */
+  NotificationsV1Controller_remove: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description The notification has been successfully deleted. */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["NotificationDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.843Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Update a notification */
+  NotificationsV1Controller_update: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateNotificationDto"];
+      };
+    };
+    responses: {
+      /** @description The notification has been successfully updated. */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["NotificationDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.843Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get all reports */
+  ReportsV1Controller_findAll: {
+    parameters: {
+      query: {
+        userId: string;
+      };
+    };
+    responses: {
+      /** @description Returns all reports */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["ReportDto"][];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.865Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+              pagination?: {
+                /**
+                 * @description Total number of items
+                 * @example 100
+                 */
+                total?: number;
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description Items per page
+                 * @example 10
+                 */
+                limit?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 10
+                 */
+                totalPages?: number;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPreviousPage?: boolean;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNextPage?: boolean;
+              };
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Create a new report */
+  ReportsV1Controller_create: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateReportDto"];
+      };
+    };
+    responses: {
+      /** @description Successful response with metadata */
+      201: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["ReportDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.865Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get a report by id */
+  ReportsV1Controller_findOne: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Returns the report */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["ReportDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.865Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Delete a report */
+  ReportsV1Controller_remove: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description The report has been successfully deleted. */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["ReportDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.865Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Update a report */
+  ReportsV1Controller_update: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateReportDto"];
+      };
+    };
+    responses: {
+      /** @description The report has been successfully updated. */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["ReportDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.865Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get all update commands */
+  UpdateCommandsV1Controller_findAll: {
+    parameters: {
+      query: {
+        gameId: string;
+      };
+    };
+    responses: {
+      /** @description Returns all update commands */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UpdateCommandDto"][];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.884Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+              pagination?: {
+                /**
+                 * @description Total number of items
+                 * @example 100
+                 */
+                total?: number;
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description Items per page
+                 * @example 10
+                 */
+                limit?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 10
+                 */
+                totalPages?: number;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPreviousPage?: boolean;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNextPage?: boolean;
+              };
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Create a new update command */
+  UpdateCommandsV1Controller_create: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateUpdateCommandDto"];
+      };
+    };
+    responses: {
+      /** @description Successful response with metadata */
+      201: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UpdateCommandDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.884Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get an update command by id */
+  UpdateCommandsV1Controller_findOne: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Returns the update command */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UpdateCommandDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.884Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Delete an update command */
+  UpdateCommandsV1Controller_remove: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description The update command has been successfully deleted. */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UpdateCommandDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.884Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Update an update command */
+  UpdateCommandsV1Controller_update: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateUpdateCommandDto"];
+      };
+    };
+    responses: {
+      /** @description The update command has been successfully updated. */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UpdateCommandDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-13T19:33:28.884Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
               path?: string;
               /** @example 1 */
               version?: string;

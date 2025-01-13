@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from './interfaces/user.interface';
+import { User, UserRole } from '@repo/database';
 
 @Injectable()
 export class UsersService {
@@ -7,13 +7,16 @@ export class UsersService {
   private readonly users: User[] = [
     {
       id: '1',
-      email: 'user@example.com',
+      telegramId: 'user@example.com',
       password: 'password123',
+      role: UserRole.ADMIN,
+      createdAt: undefined,
+      updatedAt: undefined,
     },
   ];
 
-  async findByEmail(email: string): Promise<User | null> {
-    return this.users.find((user) => user.email === email) || null;
+  async findByTelegramId(telegramId: string): Promise<User | null> {
+    return this.users.find((user) => user.telegramId === telegramId) || null;
   }
 
   async findById(id: string): Promise<User | null> {
