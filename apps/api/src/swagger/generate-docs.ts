@@ -15,7 +15,7 @@ async function generateDocs() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  const outputPath = join(process.cwd(), 'swagger.json');
+  const outputPath = join(process.cwd(), 'public', 'swagger.json');
 
   writeFileSync(outputPath, JSON.stringify(document, null, 2));
   console.log(`OpenAPI documentation generated at ${outputPath}`);

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from './interfaces/user.interface';
+import { UserRole } from '@repo/database';
 
 @Injectable()
 export class UsersService {
@@ -9,6 +10,9 @@ export class UsersService {
       id: '1',
       email: 'user@example.com',
       password: 'password123',
+      role: UserRole.ADMIN,
+      createdAt: undefined,
+      updatedAt: undefined,
     },
   ];
 

@@ -20,6 +20,8 @@
     "typeRoots": [
       "./node_modules/@types",
       "./src/common/types"
-    ]
-  }
+    ],
+    "types": ["node", "express"]
+  },
+  "include": ["src/**/*", "src/common/types/**/*.d.ts"]
 }

@@ -18,7 +18,7 @@ import { SortingQueryDto } from '../../../common/dto/sorting-query.dto';
 import { ApiResponse } from '../../../common/decorators/api-response.decorator';
 import { GameProvider } from '@repo/database';
 import { Cache } from '../../../common/decorators/cache.decorator';
-import { Public } from 'src/common/decorators/public.decorator';
+import { Public } from '../../../common/decorators/public.decorator';
 import { Roles } from '../../../common/decorators/roles.decorator';
 import { UserRole } from '@repo/database';
 

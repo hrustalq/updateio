@@ -70,6 +70,8 @@ model User {
   id           String   @id @default(cuid())
   telegramId   String?  @unique
 
+  password     String?
+
   subscriptions UserSubscription[]
   notifications Notification[]
   reports Report[]

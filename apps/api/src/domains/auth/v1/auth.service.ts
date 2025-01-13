@@ -12,6 +12,8 @@ import { Response } from 'express';
 import { JwtDto } from './dto/jwt.dto';
 import { TimeUtil } from '../../../common/utils/time.util';
 import { TokenVerificationDto } from './dto/token-verification.dto';
+import { UserResponseDto } from './dto/user-response.dto';
+import { User } from '@repo/database';
 
 @Injectable()
 export class AuthService {
@@ -172,6 +174,7 @@ export class AuthService {
       return null;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _password, ...result } = user;
     return result;
   }
@@ -222,5 +225,13 @@ export class AuthService {
       }
       throw new UnauthorizedException('Invalid token');
     }
+  }
+
+  async getCurrentUser(user: Omit<User, 'password'>): Promise<UserResponseDto> {
+    return {
+      id: user.id,
+      telegramId: user.telegramId,
+      role: user.role,
+    };
   }
 }

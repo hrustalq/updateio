@@ -1,0 +1,33 @@
+{
+  "name": "@repo/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src/",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "type-check": "tsc --noEmit",
+    "generate-types": "openapi-typescript http://localhost:3000/swagger.json --output ./src/schema.ts"
+  },
+  "dependencies": {
+    "@repo/auth": "workspace:*",
+    "@tanstack/react-query": "^5.0.0",
+    "axios": "^1.6.7",
+    "zod": "^3.22.4",
+    "zod-to-json-schema": "^3.22.3"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/react": "^18.2.55",
+    "@types/react-dom": "^18.2.19",
+    "openapi-typescript": "^6.7.4",
+    "tsup": "^8.0.2"
+  }
+} 
