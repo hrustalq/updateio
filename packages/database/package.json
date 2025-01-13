@@ -14,7 +14,6 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push --skip-generate",
     "db:migrate:dev": "prisma migrate dev",
-    "dev": "tsup --watch",
     "format": "prisma format",
     "lint": "eslint . --max-warnings 0",
     "studio": "prisma studio"

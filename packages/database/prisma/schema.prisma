@@ -59,6 +59,13 @@ model GameUpdate {
   @@index([createdAt])
 }
 
+enum UserRole {
+  ADMIN
+  MODERATOR
+  USER
+  CLIENT
+}
+
 model User {
   id           String   @id @default(cuid())
   telegramId   String?  @unique
@@ -66,6 +73,8 @@ model User {
   subscriptions UserSubscription[]
   notifications Notification[]
   reports Report[]
+
+  role UserRole @default(USER)
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
