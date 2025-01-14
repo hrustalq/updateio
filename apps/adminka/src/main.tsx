@@ -1,7 +1,9 @@
+import React from 'react'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AuthProvider } from '@repo/credentials'
 
 import { routeTree } from './routeTree.gen'
 
@@ -37,7 +39,16 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <AuthProvider
+          onAuthStateChange={(isAuthenticated) => {
+            console.log('Auth state changed:', isAuthenticated)
+            if (!isAuthenticated) {
+              router.navigate({ to: '/login' })
+            }
+          }}
+        >
+          <RouterProvider router={router} />
+        </AuthProvider>
       </QueryClientProvider>
     </StrictMode>,
   )

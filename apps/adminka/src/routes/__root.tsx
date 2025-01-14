@@ -1,40 +1,11 @@
+import React from 'react'
 import { createRootRoute, Outlet, redirect } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 import { useAuthStore } from '@/lib/auth'
-import { getCurrentUser } from '@/api/auth'
 
 import PageHeader from '../components/PageHeader'
 
 export const Route = createRootRoute({
-  beforeLoad: async ({ context, location }) => {
-    const isAuthenticated = useAuthStore.getState().isAuthenticated
-
-    // If not authenticated and not on login page, redirect to login
-    if (!isAuthenticated && location.pathname !== '/login') {
-      throw redirect({
-        to: '/login',
-        search: {
-          redirect: location.pathname,
-        },
-      })
-    }
-
-    // Try to get current user if authenticated but no user data
-    if (isAuthenticated && !useAuthStore.getState().user) {
-      try {
-        const response = await getCurrentUser()
-        useAuthStore.getState().setUser(response.user)
-      } catch (error) {
-        useAuthStore.getState().logout()
-        throw redirect({
-          to: '/login',
-          search: {
-            redirect: location.pathname,
-          },
-        })
-      }
-    }
-  },
   component: RootComponent,
 })
 

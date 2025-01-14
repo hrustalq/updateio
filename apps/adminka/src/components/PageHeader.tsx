@@ -1,6 +1,4 @@
-"use client"
-
-import * as React from "react"
+import React from 'react';
 import { Link } from "@tanstack/react-router"
 
 import { cn } from "@repo/ui/lib/utils"

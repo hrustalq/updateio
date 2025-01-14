@@ -38,13 +38,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException();
     }
-
     // Attach user to request
     req.user = {
       id: user.id,
       telegramId: user.telegramId,
       role: user.role,
       password: user.password,
+      apiKey: user.apiKey,
     };
 
     return req.user;

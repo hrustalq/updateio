@@ -2,12 +2,16 @@
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
     "outDir": "./dist",
+    "rootDir": ".",
     "types": ["node"],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src", "tsup.config.ts"],
+  "include": [
+    "src/**/*",
+    "prisma/**/*"
+  ],
   "exclude": ["node_modules", "dist"]
 } 

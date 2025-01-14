@@ -1,4 +1,19 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateGameProviderDto } from './create-game-provider.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsOptional } from 'class-validator';
 
-export class UpdateGameProviderDto extends PartialType(CreateGameProviderDto) {}
+export class UpdateGameProviderDto {
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  imageUrl?: string;
+}

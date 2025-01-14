@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
 import { GameProvidersController } from './v1/game-providers.controller';
 import { GameProvidersService } from './v1/game-providers.service';
-import { PrismaModule } from '../../common/modules/prisma/prisma.module';
-import { CacheModule } from '../../common/modules/cache/cache.module';
+import { MinioModule } from '../../common/modules/minio/minio.module';
 
 @Module({
-  imports: [PrismaModule, CacheModule],
+  imports: [MinioModule],
   controllers: [GameProvidersController],
   providers: [GameProvidersService],
-  exports: [GameProvidersService],
 })
 export class GameProvidersModule {}

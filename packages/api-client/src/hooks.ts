@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { auth, gameProviders, games, notifications, updateCommands } from './client'
+import useSWR from 'swr'
 
 // Auth hooks
 export const useLogin = () => {
@@ -90,12 +91,13 @@ export const useDeleteGame = () => {
 }
 
 // Updates hooks
-export const useNotifications = (params?: Parameters<typeof notifications.getAll>[0]) => {
-  return useQuery({
-    queryKey: ['notifications', params],
-    queryFn: () => notifications.getAll(params),
-  })
-}
+export const useNotifications = (params: { userId: string; type: string }) => {
+  const { data, error, isLoading } = useSWR(
+    ['/notifications', params],
+    () => notifications.getAll(params)
+  );
+  return { data: data?.data, error, isLoading };
+};
 
 export const useNotification = (id: string) => {
   return useQuery({
@@ -105,12 +107,13 @@ export const useNotification = (id: string) => {
 }
 
 // Settings hooks
-export const useUpdateCommands = (params?: Parameters<typeof updateCommands.getAll>[0]) => {
-  return useQuery({
-    queryKey: ['updateCommands', params],
-    queryFn: () => updateCommands.getAll(params),
-  })
-}
+export const useUpdateCommands = (params: { gameId: string }) => {
+  const { data, error, isLoading } = useSWR(
+    ['/update-commands', params],
+    () => updateCommands.getAll(params)
+  );
+  return { data: data?.data, error, isLoading };
+};
 
 export const useUpdateCommand = () => {
   return useMutation({

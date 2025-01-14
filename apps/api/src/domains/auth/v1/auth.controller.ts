@@ -1,7 +1,15 @@
-import { Controller, Post, Headers, Res, Req, Get } from '@nestjs/common';
-import { Request, Response } from 'express';
+import {
+  Controller,
+  Post,
+  Headers,
+  Res,
+  Get,
+  Body,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { ApiTags, ApiOperation, ApiCookieAuth, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { ApiResponse } from '../../../common/decorators/api-response.decorator';
 import { JwtDto } from './dto/jwt.dto';
 import { GetUser } from '../../../common/decorators/user.decorator';
@@ -9,11 +17,12 @@ import { MessageResponseDto } from '../../../common/dto/message-response.dto';
 import { TokenVerificationDto } from './dto/token-verification.dto';
 import { Auth, AuthType } from '../../../common/decorators/auth.decorator';
 import { LoginDto } from './dto/local-auth.dto';
+import { TelegramAuthDto } from './dto/telegram-auth.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { User } from '@repo/database';
 
 @ApiTags('Authentication')
-@Controller('auth')
+@Controller({ path: 'auth', version: '1' })
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -29,22 +38,20 @@ export class AuthController {
     return this.authService.getCurrentUser(user);
   }
 
-  @ApiOperation({ summary: 'Refresh access token' })
+  @ApiOperation({ summary: 'Refresh access token with refresh token in body' })
   @ApiResponse({
     status: 201,
     description: 'Token refreshed successfully',
     type: JwtDto,
   })
-  @ApiCookieAuth('refresh_token')
-  @Auth({ type: AuthType.Bearer })
-  @Post('refresh')
-  async refreshTokens(
-    @GetUser('id') userId: string,
-    @Req() req: Request,
+  @Auth({ public: true })
+  @Post('token/refresh')
+  async refreshToken(
+    @Body('refresh_token') refreshToken: string,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = req.cookies['refresh_token'];
-    return this.authService.refreshTokens(userId, refreshToken, res);
+    const { user_id } = await this.authService.verifyToken(refreshToken);
+    return this.authService.refreshTokens(user_id, refreshToken, res);
   }
 
   @ApiOperation({ summary: 'Login with email and password' })
@@ -60,6 +67,30 @@ export class AuthController {
     @GetUser() user: User,
     @Res({ passthrough: true }) res: Response,
   ) {
+    return this.authService.login(user.id, res);
+  }
+
+  @ApiOperation({ summary: 'Login with Telegram' })
+  @ApiResponse({
+    status: 201,
+    description: 'Successfully authenticated with Telegram',
+    type: JwtDto,
+  })
+  @ApiBody({ type: TelegramAuthDto })
+  @Auth({ public: true, type: AuthType.Telegram })
+  @Post('telegram/login')
+  async telegramLogin(
+    @Body() telegramAuthDto: TelegramAuthDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const isValid =
+      await this.authService.validateTelegramAuth(telegramAuthDto);
+    if (!isValid) {
+      throw new UnauthorizedException('Invalid Telegram authentication data');
+    }
+
+    const user =
+      await this.authService.findOrCreateTelegramUser(telegramAuthDto);
     return this.authService.login(user.id, res);
   }
 

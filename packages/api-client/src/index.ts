@@ -1,3 +1,3 @@
 export * from './client'
 export * from './hooks'
-export type { paths } from './schema' 
+export type { paths, components } from './schema' 

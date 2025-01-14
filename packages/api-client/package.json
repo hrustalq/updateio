@@ -10,18 +10,19 @@
   ],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch",
     "lint": "eslint src/",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "type-check": "tsc --noEmit",
     "generate-types": "openapi-typescript http://localhost:3000/swagger.json --output ./src/schema.ts"
   },
   "dependencies": {
-    "@repo/auth": "workspace:*",
-    "@tanstack/react-query": "^5.0.0",
-    "axios": "^1.6.7",
+    "@repo/shared": "workspace:*",
+    "@tanstack/react-query": "^5.17.9",
+    "axios": "^1.6.5",
+    "swr": "^2.2.4",
     "zod": "^3.22.4",
-    "zod-to-json-schema": "^3.22.3"
+    "zod-to-json-schema": "^3.22.3",
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
@@ -30,4 +31,4 @@
     "openapi-typescript": "^6.7.4",
     "tsup": "^8.0.2"
   }
-} 
+}

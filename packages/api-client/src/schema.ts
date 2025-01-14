@@ -23,13 +23,17 @@ export interface paths {
     /** Get current user information */
     get: operations["AuthController_getCurrentUser"];
   };
-  "/auth/refresh": {
-    /** Refresh access token */
-    post: operations["AuthController_refreshTokens"];
+  "/auth/token/refresh": {
+    /** Refresh access token with refresh token in body */
+    post: operations["AuthController_refreshToken"];
   };
   "/auth/login": {
     /** Login with email and password */
     post: operations["AuthController_login"];
+  };
+  "/auth/telegram/login": {
+    /** Login with Telegram */
+    post: operations["AuthController_telegramLogin"];
   };
   "/auth/logout": {
     /** Logout current user */
@@ -175,37 +179,14 @@ export interface components {
       _count?: Record<string, never>;
     };
     CreateGameProviderDto: {
-      /**
-       * @description The name of the game provider
-       * @example Steam
-       */
       name: string;
-      /**
-       * @description Description of the game provider
-       * @example Digital distribution platform for video games
-       */
-      description?: string;
-      /**
-       * @description URL to the provider logo/image
-       * @example https://example.com/steam-logo.png
-       */
+      description: string;
+      /** Format: binary */
       imageUrl?: string;
     };
     UpdateGameProviderDto: {
-      /**
-       * @description The name of the game provider
-       * @example Steam
-       */
       name?: string;
-      /**
-       * @description Description of the game provider
-       * @example Digital distribution platform for video games
-       */
       description?: string;
-      /**
-       * @description URL to the provider logo/image
-       * @example https://example.com/steam-logo.png
-       */
       imageUrl?: string;
     };
     UserResponseDto: {
@@ -219,6 +200,11 @@ export interface components {
        * @example 123456789
        */
       telegramId?: string;
+      /**
+       * @description The email of the user
+       * @example john.doe@example.com
+       */
+      email?: string;
       /**
        * @description The role of the user
        * @example USER
@@ -246,6 +232,43 @@ export interface components {
        */
       password: string;
     };
+    TelegramAuthDto: {
+      /**
+       * @description Telegram user ID
+       * @example 12345678
+       */
+      id: number;
+      /**
+       * @description User first name
+       * @example John
+       */
+      first_name?: string;
+      /**
+       * @description User last name
+       * @example Doe
+       */
+      last_name?: string;
+      /**
+       * @description Telegram username
+       * @example johndoe
+       */
+      username?: string;
+      /**
+       * @description URL to user profile photo
+       * @example https://t.me/i/userpic/123/photo.jpg
+       */
+      photo_url?: string;
+      /**
+       * @description Authentication timestamp
+       * @example 1617123456
+       */
+      auth_date: number;
+      /**
+       * @description Data hash for verification
+       * @example abc123def456...
+       */
+      hash: string;
+    };
     MessageResponseDto: {
       /**
        * @description The message of the response
@@ -264,6 +287,11 @@ export interface components {
        * @example 1678904834
        */
       expires_in: number;
+      /**
+       * @description User ID associated with the token
+       * @example 123e4567-e89b-12d3-a456-426614174000
+       */
+      user_id: string;
     };
     UserDto: {
       /**
@@ -380,7 +408,7 @@ export interface components {
        * @description URL to the game image
        * @example https://example.com/cs2.jpg
        */
-      imageUrl?: string;
+      gameProviderId?: string;
       /**
        * @description External ID of the game (e.g. Steam App ID)
        * @example 730
@@ -393,31 +421,10 @@ export interface components {
       providerId: string;
     };
     UpdateGameDto: {
-      /**
-       * @description The name of the game
-       * @example Counter-Strike 2
-       */
       name?: string;
-      /**
-       * @description The description of the game
-       * @example Popular competitive first-person shooter game
-       */
       description?: string;
-      /**
-       * @description URL to the game image
-       * @example https://example.com/cs2.jpg
-       */
+      gameProviderId?: string;
       imageUrl?: string;
-      /**
-       * @description External ID of the game (e.g. Steam App ID)
-       * @example 730
-       */
-      externalId?: string;
-      /**
-       * @description ID of the game provider
-       * @example clrk2345600000123jk5679
-       */
-      providerId?: string;
     };
     SubscriptionDto: {
       /**
@@ -691,7 +698,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.773Z
+               * @example 2025-01-14T18:09:56.380Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -805,7 +812,7 @@ export interface operations {
   GameProvidersController_create: {
     requestBody: {
       content: {
-        "application/json": components["schemas"]["CreateGameProviderDto"];
+        "multipart/form-data": components["schemas"]["CreateGameProviderDto"];
       };
     };
     responses: {
@@ -817,7 +824,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.773Z
+               * @example 2025-01-14T18:09:56.380Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -911,7 +918,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.773Z
+               * @example 2025-01-14T18:09:56.381Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -1005,7 +1012,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.773Z
+               * @example 2025-01-14T18:09:56.381Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -1092,7 +1099,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["UpdateGameProviderDto"];
+        "multipart/form-data": components["schemas"]["UpdateGameProviderDto"];
       };
     };
     responses: {
@@ -1104,7 +1111,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.773Z
+               * @example 2025-01-14T18:09:56.381Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -1193,7 +1200,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.709Z
+               * @example 2025-01-14T18:09:56.166Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/me */
@@ -1271,8 +1278,8 @@ export interface operations {
       };
     };
   };
-  /** Refresh access token */
-  AuthController_refreshTokens: {
+  /** Refresh access token with refresh token in body */
+  AuthController_refreshToken: {
     responses: {
       /** @description Token refreshed successfully */
       201: {
@@ -1282,10 +1289,10 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.709Z
+               * @example 2025-01-14T18:09:56.166Z
                */
               timestamp?: string;
-              /** @example http://localhost:3000/api/v1/refresh */
+              /** @example http://localhost:3000/api/v1/token/refresh */
               path?: string;
               /** @example 1 */
               version?: string;
@@ -1376,10 +1383,104 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.709Z
+               * @example 2025-01-14T18:09:56.167Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/login */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Login with Telegram */
+  AuthController_telegramLogin: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TelegramAuthDto"];
+      };
+    };
+    responses: {
+      /** @description Successfully authenticated with Telegram */
+      201: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["JwtDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-14T18:09:56.167Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/telegram/login */
               path?: string;
               /** @example 1 */
               version?: string;
@@ -1470,7 +1571,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.710Z
+               * @example 2025-01-14T18:09:56.167Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/logout */
@@ -1564,7 +1665,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.710Z
+               * @example 2025-01-14T18:09:56.167Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/verify */
@@ -1653,7 +1754,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.728Z
+               * @example 2025-01-14T18:09:56.185Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -1779,7 +1880,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.728Z
+               * @example 2025-01-14T18:09:56.185Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -1873,7 +1974,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.728Z
+               * @example 2025-01-14T18:09:56.185Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -1967,7 +2068,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.728Z
+               * @example 2025-01-14T18:09:56.185Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2061,7 +2162,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.728Z
+               * @example 2025-01-14T18:09:56.186Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2160,7 +2261,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.728Z
+               * @example 2025-01-14T18:09:56.186Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2241,12 +2342,17 @@ export interface operations {
   /** Get all games */
   GamesV1Controller_findAll: {
     parameters: {
-      query: {
-        providerId: string;
+      query?: {
+        /** @description Page number (starts from 1) */
+        page?: number;
+        /** @description Number of items per page */
+        limit?: number;
+        /** @description Sorting criteria (format: field:order,field2:order2) */
+        sort?: string[];
       };
     };
     responses: {
-      /** @description Returns all games */
+      /** @description Successful response with metadata */
       200: {
         content: {
           "application/json": {
@@ -2254,7 +2360,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.797Z
+               * @example 2025-01-14T18:09:56.421Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2368,7 +2474,7 @@ export interface operations {
   GamesV1Controller_create: {
     requestBody: {
       content: {
-        "application/json": components["schemas"]["CreateGameDto"];
+        "multipart/form-data": components["schemas"]["CreateGameDto"];
       };
     };
     responses: {
@@ -2380,7 +2486,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.797Z
+               * @example 2025-01-14T18:09:56.421Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2466,7 +2572,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Returns the game */
+      /** @description Successful response with metadata */
       200: {
         content: {
           "application/json": {
@@ -2474,7 +2580,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.797Z
+               * @example 2025-01-14T18:09:56.421Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2560,7 +2666,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description The game has been successfully deleted. */
+      /** @description Successful response with metadata */
       200: {
         content: {
           "application/json": {
@@ -2568,7 +2674,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.797Z
+               * @example 2025-01-14T18:09:56.421Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2655,11 +2761,11 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["UpdateGameDto"];
+        "multipart/form-data": components["schemas"]["UpdateGameDto"];
       };
     };
     responses: {
-      /** @description The game has been successfully updated. */
+      /** @description Successful response with metadata */
       200: {
         content: {
           "application/json": {
@@ -2667,7 +2773,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.797Z
+               * @example 2025-01-14T18:09:56.421Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2762,7 +2868,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.818Z
+               * @example 2025-01-14T18:09:56.440Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2888,7 +2994,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.818Z
+               * @example 2025-01-14T18:09:56.440Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2982,7 +3088,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.818Z
+               * @example 2025-01-14T18:09:56.440Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3076,7 +3182,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.818Z
+               * @example 2025-01-14T18:09:56.440Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3175,7 +3281,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.818Z
+               * @example 2025-01-14T18:09:56.440Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3270,7 +3376,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.843Z
+               * @example 2025-01-14T18:09:56.466Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3396,7 +3502,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.843Z
+               * @example 2025-01-14T18:09:56.466Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3490,7 +3596,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.843Z
+               * @example 2025-01-14T18:09:56.466Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3584,7 +3690,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.843Z
+               * @example 2025-01-14T18:09:56.466Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3683,7 +3789,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.843Z
+               * @example 2025-01-14T18:09:56.466Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3777,7 +3883,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.865Z
+               * @example 2025-01-14T18:09:56.484Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3903,7 +4009,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.865Z
+               * @example 2025-01-14T18:09:56.484Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3997,7 +4103,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.865Z
+               * @example 2025-01-14T18:09:56.484Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4091,7 +4197,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.865Z
+               * @example 2025-01-14T18:09:56.485Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4190,7 +4296,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.865Z
+               * @example 2025-01-14T18:09:56.484Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4284,7 +4390,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.884Z
+               * @example 2025-01-14T18:09:56.502Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4410,7 +4516,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.884Z
+               * @example 2025-01-14T18:09:56.502Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4504,7 +4610,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.884Z
+               * @example 2025-01-14T18:09:56.502Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4598,7 +4704,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.884Z
+               * @example 2025-01-14T18:09:56.502Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4697,7 +4803,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-13T19:33:28.884Z
+               * @example 2025-01-14T18:09:56.502Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */

@@ -8,25 +8,32 @@
   "files": [
     "dist/**"
   ],
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "scripts": {
     "build": "prisma generate && tsup --tsconfig tsconfig.build.json",
     "clean": "rm -rf .turbo node_modules dist",
     "db:generate": "prisma generate",
     "db:push": "prisma db push --skip-generate",
     "db:migrate:dev": "prisma migrate dev",
+    "db:seed": "prisma db seed",
     "format": "prisma format",
     "lint": "eslint . --max-warnings 0",
     "studio": "prisma studio"
   },
   "dependencies": {
-    "@prisma/client": "^5.10.2"
+    "@prisma/client": "^5.10.2",
+    "bcryptjs": "^2.4.3"
   },
   "devDependencies": {
     "@repo/eslint-config-common": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.11.24",
     "eslint": "^8.57.0",
     "prisma": "^5.10.2",
+    "ts-node": "^10.9.2",
     "tsup": "^8.0.2",
     "typescript": "5.5.4"
   },

@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { createHash, createHmac } from 'crypto';
 import { ConfigService } from '@nestjs/config';
@@ -13,7 +17,7 @@ import { JwtDto } from './dto/jwt.dto';
 import { TimeUtil } from '../../../common/utils/time.util';
 import { TokenVerificationDto } from './dto/token-verification.dto';
 import { UserResponseDto } from './dto/user-response.dto';
-import { User } from '@repo/database';
+import { User, UserRole } from '@repo/database';
 
 @Injectable()
 export class AuthService {
@@ -164,9 +168,14 @@ export class AuthService {
   }
 
   async validateUser(email: string, password: string) {
-    const user = await this.usersService.findOne(email);
-    if (!user) {
-      return null;
+    let user: User | null = null;
+    try {
+      user = await this.usersService.findOneByEmail(email);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return null;
+      }
+      throw error;
     }
 
     const isPasswordValid = await compare(password, user.password);
@@ -182,9 +191,17 @@ export class AuthService {
   private setRefreshTokenCookie(res: Response, token: string): void {
     res.cookie(this.REFRESH_COOKIE_NAME, token, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      maxAge: this.getTokenExpiryTime(token) * 1000, // Convert to milliseconds
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none',
+      expires: new Date(
+        Date.now() +
+          TimeUtil.parseDuration(
+            this.configService.get('auth.jwt.refreshExpiresIn'),
+          ),
+      ),
+      maxAge: TimeUtil.parseDuration(
+        this.configService.get('auth.jwt.refreshExpiresIn'),
+      ),
       path: '/auth/refresh', // Only send cookie to refresh endpoint
     });
   }
@@ -200,29 +217,19 @@ export class AuthService {
 
   async verifyToken(token: string): Promise<TokenVerificationDto> {
     try {
-      // Check if token is blacklisted
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(token);
       const isBlacklisted = await this.isTokenBlacklisted(token);
+
       if (isBlacklisted) {
-        throw new UnauthorizedException('Token has been revoked');
-      }
-
-      // Verify and decode the token
-      const decoded = this.jwtService.verify(token, {
-        secret: this.configService.get('auth.jwt.secret'),
-      });
-
-      if (!decoded.iat || !decoded.exp) {
-        throw new UnauthorizedException('Invalid token format');
+        throw new UnauthorizedException('Token is blacklisted');
       }
 
       return {
-        issued_at: decoded.iat,
-        expires_in: decoded.exp,
+        issued_at: payload.iat,
+        expires_in: payload.exp,
+        user_id: payload.id,
       };
     } catch (error) {
-      if (error instanceof UnauthorizedException) {
-        throw error;
-      }
       throw new UnauthorizedException('Invalid token');
     }
   }
@@ -233,5 +240,24 @@ export class AuthService {
       telegramId: user.telegramId,
       role: user.role,
     };
+  }
+
+  async findOrCreateTelegramUser(
+    telegramAuthDto: TelegramAuthDto,
+  ): Promise<User> {
+    try {
+      const user = await this.usersService.findByTelegramId(
+        telegramAuthDto.id.toString(),
+      );
+      return user;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        return this.usersService.create({
+          telegramId: telegramAuthDto.id.toString(),
+          role: UserRole.USER,
+        });
+      }
+      throw error;
+    }
   }
 }

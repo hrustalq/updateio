@@ -8,14 +8,23 @@
   "files": ["dist/**"],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch",
     "lint": "eslint src/",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "zustand": "^4.5.0"
+    "@repo/shared": "workspace:*",
+    "@repo/api-client": "workspace:*",
+    "react": "^18.2.0",
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
-    "tsup": "^8.0.2"
+    "@repo/typescript-config": "workspace:*",
+    "@types/react": "^18.2.46",
+    "eslint": "^8.56.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
   }
 } 

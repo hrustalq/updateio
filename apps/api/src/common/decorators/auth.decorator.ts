@@ -5,9 +5,9 @@ import { LocalGuard } from '../../domains/auth/v1/guards/local.guard';
 import { JwtGuard } from '../../domains/auth/v1/guards/jwt.guard';
 
 export enum AuthType {
-  None = 'none',
-  Bearer = 'bearer',
-  Local = 'local',
+  Bearer = 'Bearer',
+  Local = 'Local',
+  Telegram = 'Telegram',
 }
 
 interface AuthOptions {
@@ -30,7 +30,7 @@ export function Auth(options: AuthOptions = {}) {
     case AuthType.Local:
       decorators.push(UseGuards(LocalGuard));
       break;
-    case AuthType.None:
+    case AuthType.Telegram:
     default:
       break;
   }

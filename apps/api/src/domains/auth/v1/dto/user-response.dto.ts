@@ -16,6 +16,13 @@ export class UserResponseDto {
   telegramId?: string;
 
   @ApiProperty({
+    description: 'The email of the user',
+    example: 'john.doe@example.com',
+    required: false,
+  })
+  email?: string;
+
+  @ApiProperty({
     description: 'The role of the user',
     enum: UserRole,
     example: UserRole.USER,

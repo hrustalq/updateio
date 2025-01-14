@@ -7,8 +7,10 @@ import {
   Param,
   Delete,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiConsumes } from '@nestjs/swagger';
 import { GameProvidersService } from './game-providers.service';
 import { CreateGameProviderDto } from './dto/create-game-provider.dto';
 import { UpdateGameProviderDto } from './dto/update-game-provider.dto';
@@ -21,6 +23,8 @@ import { Cache } from '../../../common/decorators/cache.decorator';
 import { Public } from '../../../common/decorators/public.decorator';
 import { Roles } from '../../../common/decorators/roles.decorator';
 import { UserRole } from '@repo/database';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { MinioService } from '../../../common/modules/minio/minio.service';
 
 @ApiTags('Game Providers')
 @Controller({
@@ -28,14 +32,33 @@ import { UserRole } from '@repo/database';
   version: '1',
 })
 export class GameProvidersController {
-  constructor(private readonly gameProvidersService: GameProvidersService) {}
+  constructor(
+    private readonly gameProvidersService: GameProvidersService,
+    private readonly minioService: MinioService,
+  ) {}
 
   @Post()
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create a new game provider' })
   @ApiResponse({ type: GameProviderDto, status: 201 })
-  create(@Body() createGameProviderDto: CreateGameProviderDto) {
-    return this.gameProvidersService.create(createGameProviderDto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('imageUrl'))
+  async create(
+    @Body() createGameProviderDto: CreateGameProviderDto,
+    @UploadedFile() imageFile?: Express.Multer.File,
+  ) {
+    let imageUrl: string | undefined;
+
+    if (imageFile) {
+      const objectName = `game-providers/${Date.now()}-${imageFile.originalname}`;
+      await this.minioService.uploadFile(imageFile, objectName);
+      imageUrl = await this.minioService.getFileUrl(objectName);
+    }
+
+    return this.gameProvidersService.create({
+      ...createGameProviderDto,
+      imageUrl,
+    });
   }
 
   @Get()
@@ -63,11 +86,25 @@ export class GameProvidersController {
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Update a game provider' })
   @ApiResponse({ type: GameProviderDto })
-  update(
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('imageUrl'))
+  async update(
     @Param('id') id: string,
     @Body() updateGameProviderDto: UpdateGameProviderDto,
+    @UploadedFile() imageFile?: Express.Multer.File,
   ) {
-    return this.gameProvidersService.update(id, updateGameProviderDto);
+    let imageUrl: string | undefined;
+
+    if (imageFile) {
+      const objectName = `game-providers/${Date.now()}-${imageFile.originalname}`;
+      await this.minioService.uploadFile(imageFile, objectName);
+      imageUrl = await this.minioService.getFileUrl(objectName);
+    }
+
+    return this.gameProvidersService.update(id, {
+      ...updateGameProviderDto,
+      ...(imageUrl && { imageUrl }),
+    });
   }
 
   @Delete(':id')

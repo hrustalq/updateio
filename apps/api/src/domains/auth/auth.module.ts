@@ -5,6 +5,7 @@ import { AuthService } from './v1/auth.service';
 import { AuthController } from './v1/auth.controller';
 import { JwtStrategy } from './v1/strategies/jwt.strategy';
 import { LocalStrategy } from './v1/strategies/local.strategy';
+import { TelegramStrategy } from './v1/strategies/telegram.strategy';
 import { CacheModule } from '../../common/modules/cache/cache.module';
 import { UsersModule } from '../users/users.module';
 import { JwtGuard } from './v1/guards/jwt.guard';
@@ -33,6 +34,7 @@ import authConfig from '../../config/auth.config';
     AuthService,
     JwtStrategy,
     LocalStrategy,
+    TelegramStrategy,
     JwtGuard,
     LocalGuard,
     TelegramGuard,

@@ -1,15 +1,40 @@
 import axios from 'axios'
 import type { paths } from './schema'
-import { useAuthStore } from '@repo/auth'
+import type { AuthState } from '@repo/shared'
+import { create } from 'zustand'
+
+const getEnvVar = (key: string): string | undefined => {
+  // Vite environment
+  // @ts-ignore - Vite defines import.meta.env
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
+    // @ts-ignore - Vite environment variables
+    return import.meta.env[key]
+  }
+
+  // Node.js / Next.js environment
+  if (typeof process !== 'undefined' && process.env && process.env[key]) {
+    return process.env[key]
+  }
+
+  return undefined
+}
+
+// Default API URL if environment variables are not set
+const DEFAULT_API_URL = getEnvVar('FALLBACK_API_URL');
+
+// Create a minimal auth store just for token management
+const useTokenStore = create<Pick<AuthState, 'accessToken'>>((set) => ({
+  accessToken: null,
+}))
 
 export const apiClient = axios.create({
-  baseURL: process.env.VITE_API_URL,
+  baseURL: `${getEnvVar('VITE_API_URL') || getEnvVar('NEXT_PUBLIC_API_URL') || DEFAULT_API_URL}/v1`,
   withCredentials: true,
 })
 
 // Add auth header interceptor
 apiClient.interceptors.request.use((config) => {
-  const accessToken = useAuthStore.getState().accessToken
+  const accessToken = useTokenStore.getState().accessToken
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`
   }
@@ -22,23 +47,33 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Don't attempt refresh if:
+    // 1. It's not a 401 error
+    // 2. It's a 401 from the auth endpoints (login, refresh, etc)
+    // 3. We've already tried to refresh
+    if (
+      error.response?.status === 401 && 
+      !originalRequest._retry &&
+      !originalRequest.url?.includes('/auth/login') &&
+      !originalRequest.url?.includes('/auth/token/refresh')
+    ) {
       originalRequest._retry = true
 
       try {
-        const response = await apiClient.post<paths['/auth/refresh']['post']['responses']['201']['content']['application/json']>('/auth/refresh')
+        const response = await apiClient.post<paths['/auth/token/refresh']['post']['responses']['201']['content']['application/json']>('/auth/token/refresh')
         const { data } = response.data
         if (!data) {
           throw new Error('No data returned from refresh endpoint')
         }
         const { access_token: accessToken } = data
 
-        useAuthStore.getState().setAccessToken(accessToken)
+        useTokenStore.getState().accessToken = accessToken
         originalRequest.headers.Authorization = `Bearer ${accessToken}`
         return apiClient(originalRequest)
       } catch (refreshError) {
-        useAuthStore.getState().logout()
-        throw refreshError
+        // Clear token and reject with original error
+        useTokenStore.getState().accessToken = null
+        return Promise.reject(error)
       }
     }
 
@@ -50,11 +85,17 @@ apiClient.interceptors.response.use(
 export const auth = {
   login: async (credentials: paths['/auth/login']['post']['requestBody']['content']['application/json']) => {
     const response = await apiClient.post<paths['/auth/login']['post']['responses']['201']['content']['application/json']>('/auth/login', credentials)
+    useTokenStore.getState().accessToken = response.data.data?.access_token ?? null
+    return response.data
+  },
+
+  telegramLogin: async (data: paths['/auth/telegram/login']['post']['requestBody']['content']['application/json']) => {
+    const response = await apiClient.post<paths['/auth/telegram/login']['post']['responses']['201']['content']['application/json']>('/auth/telegram/login', data)
     return response.data
   },
 
   logout: async () => {
-    await apiClient.post('/v1/auth/logout')
+    await apiClient.post('/auth/logout')
   },
 
   verify: async (token: string) => {
@@ -65,6 +106,43 @@ export const auth = {
   getCurrentUser: async () => {
     const response = await apiClient.get<paths['/auth/me']['get']['responses']['200']['content']['application/json']>('/auth/me')
     return response.data
+  },
+
+  refreshToken: async () => {
+    const response = await apiClient.post<paths['/auth/token/refresh']['post']['responses']['201']['content']['application/json']>('/auth/token/refresh')
+    return response.data
+  },
+}
+
+// Users endpoints
+export const users = {
+  getAll: async () => {
+    const response = await apiClient.get<paths['/users']['get']['responses']['200']['content']['application/json']>('/users')
+    return response.data
+  },
+
+  getById: async (id: string) => {
+    const response = await apiClient.get<paths['/users/{id}']['get']['responses']['200']['content']['application/json']>(`/users/${id}`)
+    return response.data
+  },
+
+  getByTelegramId: async (telegramId: string) => {
+    const response = await apiClient.get<paths['/users/telegram/{telegramId}']['get']['responses']['200']['content']['application/json']>(`/users/telegram/${telegramId}`)
+    return response.data
+  },
+
+  create: async (data: paths['/users']['post']['requestBody']['content']['application/json']) => {
+    const response = await apiClient.post<paths['/users']['post']['responses']['201']['content']['application/json']>('/users', data)
+    return response.data
+  },
+
+  update: async (id: string, data: paths['/users/{id}']['patch']['requestBody']['content']['application/json']) => {
+    const response = await apiClient.patch<paths['/users/{id}']['patch']['responses']['200']['content']['application/json']>(`/users/${id}`, data)
+    return response.data
+  },
+
+  delete: async (id: string) => {
+    await apiClient.delete(`/users/${id}`)
   },
 }
 
@@ -80,18 +158,18 @@ export const gameProviders = {
     return response.data
   },
 
-  create: async (data: paths['/game-providers']['post']['requestBody']['content']['application/json']) => {
+  create: async (data: paths['/game-providers']['post']['requestBody']['content']['multipart/form-data']) => {
     const response = await apiClient.post<paths['/game-providers']['post']['responses']['201']['content']['application/json']>('/game-providers', data)
     return response.data
   },
 
-  update: async (id: string, data: paths['/game-providers/{id}']['patch']['requestBody']['content']['application/json']) => {
+  update: async (id: string, data: paths['/game-providers/{id}']['patch']['requestBody']['content']['multipart/form-data']) => {
     const response = await apiClient.patch<paths['/game-providers/{id}']['patch']['responses']['200']['content']['application/json']>(`/game-providers/${id}`, data)
     return response.data
   },
 
   delete: async (id: string) => {
-    await apiClient.delete(`/v1/game-providers/${id}`)
+    await apiClient.delete(`/game-providers/${id}`)
   },
 }
 
@@ -103,28 +181,55 @@ export const games = {
   },
 
   getById: async (id: string) => {
-    const response = await apiClient.get<paths['/games/{id}']['get']['responses']['200']['content']['application/json']>(`/v1/games/${id}`)
+    const response = await apiClient.get<paths['/games/{id}']['get']['responses']['200']['content']['application/json']>(`/games/${id}`)
     return response.data
   },
 
-  create: async (data: paths['/games']['post']['requestBody']['content']['application/json']) => {
+  create: async (data: paths['/games']['post']['requestBody']['content']['multipart/form-data']) => {
     const response = await apiClient.post<paths['/games']['post']['responses']['201']['content']['application/json']>('/games', data)
     return response.data
   },
 
-  update: async (id: string, data: paths['/games/{id}']['patch']['requestBody']['content']['application/json']) => {
+  update: async (id: string, data: paths['/games/{id}']['patch']['requestBody']['content']['multipart/form-data']) => {
     const response = await apiClient.patch<paths['/games/{id}']['patch']['responses']['200']['content']['application/json']>(`/games/${id}`, data)
     return response.data
   },
 
   delete: async (id: string) => {
-    await apiClient.delete(`/v1/games/${id}`)
+    await apiClient.delete(`/games/${id}`)
+  },
+}
+
+// Subscriptions endpoints
+export const subscriptions = {
+  getAll: async (params: paths['/subscriptions']['get']['parameters']['query']) => {
+    const response = await apiClient.get<paths['/subscriptions']['get']['responses']['200']['content']['application/json']>('/subscriptions', { params })
+    return response.data
+  },
+
+  getById: async (id: string) => {
+    const response = await apiClient.get<paths['/subscriptions/{id}']['get']['responses']['200']['content']['application/json']>(`/subscriptions/${id}`)
+    return response.data
+  },
+
+  create: async (data: paths['/subscriptions']['post']['requestBody']['content']['application/json']) => {
+    const response = await apiClient.post<paths['/subscriptions']['post']['responses']['201']['content']['application/json']>('/subscriptions', data)
+    return response.data
+  },
+
+  update: async (id: string, data: paths['/subscriptions/{id}']['patch']['requestBody']['content']['application/json']) => {
+    const response = await apiClient.patch<paths['/subscriptions/{id}']['patch']['responses']['200']['content']['application/json']>(`/subscriptions/${id}`, data)
+    return response.data
+  },
+
+  delete: async (id: string) => {
+    await apiClient.delete(`/subscriptions/${id}`)
   },
 }
 
 // Notifications endpoints
 export const notifications = {
-  getAll: async (params?: paths['/notifications']['get']['parameters']['query']) => {
+  getAll: async (params: paths['/notifications']['get']['parameters']['query']) => {
     const response = await apiClient.get<paths['/notifications']['get']['responses']['200']['content']['application/json']>('/notifications', { params })
     return response.data
   },
@@ -145,14 +250,46 @@ export const notifications = {
   },
 
   delete: async (id: string) => {
-    await apiClient.delete(`/v1/notifications/${id}`)
+    await apiClient.delete(`/notifications/${id}`)
+  },
+}
+
+// Reports endpoints
+export const reports = {
+  getAll: async (params: paths['/reports']['get']['parameters']['query']) => {
+    const response = await apiClient.get<paths['/reports']['get']['responses']['200']['content']['application/json']>('/reports', { params })
+    return response.data
+  },
+
+  getById: async (id: string) => {
+    const response = await apiClient.get<paths['/reports/{id}']['get']['responses']['200']['content']['application/json']>(`/reports/${id}`)
+    return response.data
+  },
+
+  create: async (data: paths['/reports']['post']['requestBody']['content']['application/json']) => {
+    const response = await apiClient.post<paths['/reports']['post']['responses']['201']['content']['application/json']>('/reports', data)
+    return response.data
+  },
+
+  update: async (id: string, data: paths['/reports/{id}']['patch']['requestBody']['content']['application/json']) => {
+    const response = await apiClient.patch<paths['/reports/{id}']['patch']['responses']['200']['content']['application/json']>(`/reports/${id}`, data)
+    return response.data
+  },
+
+  delete: async (id: string) => {
+    await apiClient.delete(`/reports/${id}`)
   },
 }
 
 // Update commands endpoints
 export const updateCommands = {
-  getAll: async (params?: paths['/update-commands']['get']['parameters']['query']) => {
+  getAll: async (params: paths['/update-commands']['get']['parameters']['query']) => {
     const response = await apiClient.get<paths['/update-commands']['get']['responses']['200']['content']['application/json']>('/update-commands', { params })
+    return response.data
+  },
+
+  getById: async (id: string) => {
+    const response = await apiClient.get<paths['/update-commands/{id}']['get']['responses']['200']['content']['application/json']>(`/update-commands/${id}`)
     return response.data
   },
 
@@ -167,6 +304,7 @@ export const updateCommands = {
   },
 
   delete: async (id: string) => {
-    await apiClient.delete(`/v1/update-commands/${id}`)
+    await apiClient.delete(`/update-commands/${id}`)
   },
 }
+

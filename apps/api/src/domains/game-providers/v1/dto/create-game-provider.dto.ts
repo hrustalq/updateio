@@ -1,30 +1,17 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsOptional, IsUrl, MinLength } from 'class-validator';
-import { GameProvider as GameProviderDb } from '@repo/database';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsNotEmpty } from 'class-validator';
 
-export class CreateGameProviderDto implements Partial<GameProviderDb> {
-  @ApiProperty({
-    description: 'The name of the game provider',
-    example: 'Steam',
-    minLength: 2,
-  })
+export class CreateGameProviderDto {
+  @ApiProperty()
   @IsString()
-  @MinLength(2)
+  @IsNotEmpty()
   name: string;
 
-  @ApiPropertyOptional({
-    description: 'Description of the game provider',
-    example: 'Digital distribution platform for video games',
-  })
+  @ApiProperty()
   @IsString()
-  @IsOptional()
-  description?: string;
+  @IsNotEmpty()
+  description: string;
 
-  @ApiPropertyOptional({
-    description: 'URL to the provider logo/image',
-    example: 'https://example.com/steam-logo.png',
-  })
-  @IsUrl()
-  @IsOptional()
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
   imageUrl?: string;
 }

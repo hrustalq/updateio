@@ -12,4 +12,10 @@ export class TokenVerificationDto {
     example: 1678904834,
   })
   expires_in: number;
+
+  @ApiProperty({
+    description: 'User ID associated with the token',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  user_id: string;
 }

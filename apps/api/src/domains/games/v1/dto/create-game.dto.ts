@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateGameDto {
   @ApiProperty({
@@ -25,8 +25,8 @@ export class CreateGameDto {
     required: false,
   })
   @IsString()
-  @IsOptional()
-  imageUrl?: string;
+  @IsNotEmpty()
+  gameProviderId: string;
 
   @ApiProperty({
     description: 'External ID of the game (e.g. Steam App ID)',

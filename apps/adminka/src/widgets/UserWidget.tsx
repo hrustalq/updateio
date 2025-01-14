@@ -1,4 +1,5 @@
-import { useNavigate } from '@tanstack/react-router'
+import React from 'react'
+import { useAuth } from '@repo/credentials'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,57 +9,33 @@ import {
   DropdownMenuTrigger,
 } from '@repo/ui/components/dropdown-menu'
 import { Button } from '@repo/ui/components/button'
-import { Avatar, AvatarFallback } from '@repo/ui/components/avatar'
-import { useAuthStore } from '@/lib/auth'
-import { logout } from '@/api/auth'
 
 export default function UserWidget() {
-  const navigate = useNavigate()
-  const { user, isAuthenticated } = useAuthStore()
-
-  if (!isAuthenticated || !user) {
-    return (
-      <Button variant="outline" onClick={() => navigate({ to: '/login' })}>
-        Войти
-      </Button>
-    )
-  }
-
-  const handleLogout = async () => {
-    try {
-      await logout()
-      navigate({ to: '/login' })
-    } catch (error) {
-      console.error('Failed to logout:', error)
-    }
-  }
+  const { logout, loading, user } = useAuth()
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
-            <AvatarFallback>
-              {user.username.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <span className="font-medium">{user?.email?.charAt(0).toUpperCase()}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.username}</p>
+            <p className="text-sm font-medium leading-none">{user?.email}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              {user.email}
+              {user?.role}
             </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          className="text-destructive focus:text-destructive cursor-pointer"
-          onClick={handleLogout}
+          disabled={loading}
+          onClick={() => logout()}
+          className="text-red-600 cursor-pointer"
         >
-          Выйти
+          {loading ? 'Выход...' : 'Выйти'}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

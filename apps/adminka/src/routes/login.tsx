@@ -1,8 +1,10 @@
+import React from 'react'
 import { useState } from 'react'
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useAuth } from '@repo/credentials'
 
 import {
   Form,
@@ -15,8 +17,6 @@ import {
 import { Input } from '@repo/ui/components/input'
 import { Button } from '@repo/ui/components/button'
 import { Alert, AlertDescription } from '@repo/ui/components/alert'
-import { useAuthStore } from '@/lib/auth'
-import { login } from '@/api/auth'
 
 const loginSchema = z.object({
   email: z.string().email('Введите корректный email'),
@@ -27,20 +27,14 @@ type LoginForm = z.infer<typeof loginSchema>
 
 export const Route = createFileRoute('/login')({
   beforeLoad: async ({ context }) => {
-    const isAuthenticated = useAuthStore.getState().isAuthenticated
-    if (isAuthenticated) {
-      throw redirect({
-        to: '/',
-      })
-    }
+    // No need for beforeLoad check as the AuthProvider will handle redirects
   },
   component: LoginPage,
 })
 
 function LoginPage() {
   const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const { setUser, setAccessToken } = useAuthStore()
+  const { login, loading } = useAuth()
 
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -53,21 +47,16 @@ function LoginPage() {
   const onSubmit = async (data: LoginForm) => {
     try {
       setError(null)
-      setIsLoading(true)
-      const response = await login(data)
-      setUser(response.user)
-      setAccessToken(response.accessToken)
-      // Router will automatically redirect due to beforeLoad check
+      await login(data.email, data.password)
+      // AuthProvider will handle the redirect
     } catch (err) {
       setError('Неверный email или пароль')
-    } finally {
-      setIsLoading(false)
     }
   }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background flex-1 basis-full w-full">
-      <div className="w-full max-w-lg p-8 space-y-6 bg-card rounded-xl border shadow-lg p-4">
+      <div className="w-full max-w-lg space-y-6 bg-card rounded-xl border shadow-lg p-4">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-semibold tracking-tight">
             UpdateIO
@@ -127,9 +116,9 @@ function LoginPage() {
               type="submit"
               className="w-full"
               size="lg"
-              disabled={isLoading}
+              disabled={loading}
             >
-              {isLoading ? 'Вход...' : 'Войти'}
+              {loading ? 'Вход...' : 'Войти'}
             </Button>
           </form>
         </Form>
