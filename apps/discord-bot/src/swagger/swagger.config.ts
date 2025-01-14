@@ -18,11 +18,23 @@ export const swaggerConfig = new DocumentBuilder()
     [
       'API documentation for the Discord Bot.',
       '',
+      '## Authentication',
+      'This API uses API key authentication. Add your API key to the `X-API-KEY` header.',
+      'API keys are prefixed with `discord_` and can be generated through the `/api/v1/auth/api-key/generate` endpoint.',
+      '',
       'Download [swagger.json](/swagger.json)',
     ].join('\n'),
   )
   .setVersion('1.0')
-  .addBearerAuth()
+  .addApiKey(
+    {
+      type: 'apiKey',
+      in: 'header',
+      name: 'X-API-KEY',
+      description: 'API key for authentication',
+    },
+    'api-key',
+  )
   .build();
 
 export const swaggerOptions = {

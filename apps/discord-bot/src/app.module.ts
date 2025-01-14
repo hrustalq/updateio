@@ -5,8 +5,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { validate } from './config/config.validation';
 import appConfig from './config/app.config';
-import authConfig from './config/auth.config';
-import redisConfig from './config/redis.config';
 
 import { LoggerMiddleware } from './common/middlewares/logger.middleware';
 import { MetadataInterceptor } from './common/interceptors/metadata.interceptor';
@@ -17,29 +15,33 @@ import helmet from 'helmet';
 
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { CacheModule } from './common/modules/cache/cache.module';
 
 import { AuthModule } from './domains/auth/auth.module';
-import { GlobalAuthGuard } from './common/guards/global-auth.guard';
+import { ApiKeyGuard } from './domains/auth/v1/guards/api-key.guard';
 import { PrismaModule } from './common/modules/prisma/prisma.module';
+import { HealthCheckModule } from './domains/health-check/health-check.module';
+import { DiscordModule } from './common/modules/discord/discord.module';
+import { GameUpdatesModule } from './domains/game-updates/game-updates.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       validate,
-      load: [appConfig, redisConfig, authConfig],
+      load: [appConfig],
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
     PrismaModule,
-    CacheModule,
     AuthModule,
+    HealthCheckModule,
+    DiscordModule,
+    GameUpdatesModule,
   ],
   providers: [
     {
       provide: APP_GUARD,
-      useClass: GlobalAuthGuard,
+      useClass: ApiKeyGuard,
     },
     {
       provide: APP_PIPE,

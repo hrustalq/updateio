@@ -1,41 +1,53 @@
-import { DocumentBuilder } from '@nestjs/swagger';
-import {
-  ErrorResponseSchema,
-  BaseResponseSchema,
-  BaseMetadataSchema,
-  PaginatedResponseSchema,
-  PaginationMetadataSchema,
-  PaginatedMetadataSchema,
-} from '../common/schemas/responses';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { INestApplication } from '@nestjs/common';
 
-import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
-import { FindOneParamsDto } from '../common/dto/find-one-params.dto';
-import { SortingQueryDto } from '../common/dto/sorting-query.dto';
+const API_VERSION = '1.0.0';
 
-export const swaggerConfig = new DocumentBuilder()
-  .setTitle('Telegram Bot API Documentation')
-  .setDescription(
-    [
-      'API documentation for the Telegram Bot.',
-      '',
-      'Download [swagger.json](/swagger.json)',
-    ].join('\n'),
-  )
-  .setVersion('1.0')
-  .addBearerAuth()
-  .build();
+export function setupSwagger(app: INestApplication) {
+  const options = new DocumentBuilder()
+    .setTitle('Telegram Bot API')
+    .setDescription(
+      `
+## Authentication
+All endpoints (except those marked as public) require authentication using an API key.
+The API key should be provided in the \`X-API-KEY\` header.
 
-export const swaggerOptions = {
-  include: [],
-  extraModels: [
-    ErrorResponseSchema,
-    BaseResponseSchema,
-    PaginatedResponseSchema,
-    PaginatedMetadataSchema,
-    PaginationMetadataSchema,
-    BaseMetadataSchema,
-    PaginationQueryDto,
-    FindOneParamsDto,
-    SortingQueryDto,
-  ],
-};
+## API Key Format
+API keys are prefixed with \`tg_\` followed by a 64-character hexadecimal string.
+Example: \`tg_1a2b3c4d...\`
+
+## Roles
+Some endpoints require specific user roles:
+- \`ADMIN\`: Full access to all endpoints
+- \`MODERATOR\`: Access to moderation endpoints
+- \`USER\`: Basic user access
+- \`CLIENT\`: Client-specific access
+
+## Health Checks
+Public health check endpoints are available at:
+- \`GET /v1/health\`: Basic health status
+- \`GET /v1/health/readiness\`: Readiness probe (includes database status)
+- \`GET /v1/health/liveness\`: Liveness probe
+`,
+    )
+    .setVersion(API_VERSION)
+    .addApiKey(
+      {
+        type: 'apiKey',
+        name: 'X-API-KEY',
+        in: 'header',
+        description: 'API key for authentication',
+      },
+      'X-API-KEY',
+    )
+    .build();
+
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+      tagsSorter: 'alpha',
+      operationsSorter: 'alpha',
+    },
+  });
+}

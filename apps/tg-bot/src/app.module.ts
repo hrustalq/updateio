@@ -20,9 +20,9 @@ import { join } from 'path';
 import { CacheModule } from './common/modules/cache/cache.module';
 
 import { AuthModule } from './domains/auth/auth.module';
-import { GlobalAuthGuard } from './common/guards/global-auth.guard';
+import { ApiKeyGuard } from './domains/auth/v1/guards/api-key.guard';
 import { PrismaModule } from './common/modules/prisma/prisma.module';
-import { GameProvidersModule } from './domains/game-providers/game-providers.module';
+import { HealthCheckModule } from './domains/health-check/health-check.module';
 
 @Module({
   imports: [
@@ -35,13 +35,13 @@ import { GameProvidersModule } from './domains/game-providers/game-providers.mod
     }),
     PrismaModule,
     CacheModule,
-    GameProvidersModule,
     AuthModule,
+    HealthCheckModule,
   ],
   providers: [
     {
       provide: APP_GUARD,
-      useClass: GlobalAuthGuard,
+      useClass: ApiKeyGuard,
     },
     {
       provide: APP_PIPE,

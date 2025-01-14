@@ -7,12 +7,10 @@ import { Logger as CustomLogger } from './common/services/logger.service';
 
 import { ConfigService } from '@nestjs/config';
 
-import { SwaggerModule } from '@nestjs/swagger';
-
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 
-import { swaggerConfig, swaggerOptions } from './swagger/swagger.config';
+import { setupSwagger } from './swagger/swagger.config';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -42,12 +40,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   /** Swagger */
-  const document = SwaggerModule.createDocument(
-    app,
-    swaggerConfig,
-    swaggerOptions,
-  );
-  SwaggerModule.setup('docs', app, document);
+  setupSwagger(app);
 
   /** Initializing app config using environment variables & nestjs/config */
   const port = parseInt(configService.get<string>('PORT'), 10);
@@ -55,9 +48,7 @@ async function bootstrap() {
 
   await app.listen(port, host, () => {
     Logger.debug(`App is running on ${host}:${port}`);
-    Logger.debug(
-      `Swagger JSON available at http://${host}:${port}/swagger.json`,
-    );
+    Logger.debug(`Swagger docs available at http://${host}:${port}/docs`);
   });
 }
 bootstrap();

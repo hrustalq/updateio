@@ -1,19 +1,23 @@
-import { Controller, Post, Headers, Res, Req, Get } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Controller, Get, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiTags, ApiOperation, ApiCookieAuth, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiResponse } from '../../../common/decorators/api-response.decorator';
-import { JwtDto } from './dto/jwt.dto';
 import { GetUser } from '../../../common/decorators/user.decorator';
-import { MessageResponseDto } from '../../../common/dto/message-response.dto';
-import { TokenVerificationDto } from './dto/token-verification.dto';
-import { Auth, AuthType } from '../../../common/decorators/auth.decorator';
-import { LoginDto } from './dto/local-auth.dto';
+import { User, UserRole } from '@repo/database';
+import { Auth } from '../../../common/decorators/auth.decorator';
+import { Roles } from '../../../common/decorators/roles.decorator';
 import { UserResponseDto } from './dto/user-response.dto';
-import { User } from '@repo/database';
+import {
+  ApiKeyResponseDto,
+  ApiKeyMessageDto,
+} from './dto/api-key-response.dto';
 
 @ApiTags('Authentication')
-@Controller('auth')
+@Controller({
+  version: '1',
+  path: 'auth',
+})
+@Auth()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -23,74 +27,39 @@ export class AuthController {
     description: 'Returns the current user information',
     type: UserResponseDto,
   })
-  @Auth({ type: AuthType.Bearer })
   @Get('me')
   async getCurrentUser(@GetUser() user: User): Promise<UserResponseDto> {
-    return this.authService.getCurrentUser(user);
+    return {
+      id: user.id,
+      telegramId: user.telegramId,
+      role: user.role,
+    };
   }
 
-  @ApiOperation({ summary: 'Refresh access token' })
+  @ApiOperation({ summary: 'Generate new API key' })
   @ApiResponse({
     status: 201,
-    description: 'Token refreshed successfully',
-    type: JwtDto,
+    description: 'New API key generated successfully',
+    type: ApiKeyResponseDto,
   })
-  @ApiCookieAuth('refresh_token')
-  @Auth({ type: AuthType.Bearer })
-  @Post('refresh')
-  async refreshTokens(
+  @Roles(UserRole.ADMIN)
+  @Post('api-key/generate')
+  async generateApiKey(
     @GetUser('id') userId: string,
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    const refreshToken = req.cookies['refresh_token'];
-    return this.authService.refreshTokens(userId, refreshToken, res);
+  ): Promise<ApiKeyResponseDto> {
+    return this.authService.generateApiKey(userId);
   }
 
-  @ApiOperation({ summary: 'Login with email and password' })
-  @ApiResponse({
-    status: 201,
-    description: 'Successfully authenticated',
-    type: JwtDto,
-  })
-  @ApiBody({ type: LoginDto })
-  @Auth({ public: true, type: AuthType.Local })
-  @Post('login')
-  async login(
-    @GetUser() user: User,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    return this.authService.login(user.id, res);
-  }
-
-  @ApiOperation({ summary: 'Logout current user' })
+  @ApiOperation({ summary: 'Revoke current API key' })
   @ApiResponse({
     status: 200,
-    description: 'Successfully logged out',
-    type: MessageResponseDto,
+    description: 'API key revoked successfully',
+    type: ApiKeyMessageDto,
   })
-  @Auth({ type: AuthType.Bearer })
-  @Post('logout')
-  async logout(
-    @GetUser('id') userId: string,
-    @Headers('authorization') auth: string,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    const token = auth.replace('Bearer ', '');
-    await this.authService.logout(userId, token, res);
-    return { message: 'Successfully logged out' };
-  }
-
-  @ApiOperation({ summary: 'Verify access token' })
-  @ApiResponse({
-    status: 200,
-    description: 'Token verification result',
-    type: TokenVerificationDto,
-  })
-  @Auth({ type: AuthType.Bearer })
-  @Get('verify')
-  async verify(@Headers('authorization') auth: string) {
-    const token = auth.replace('Bearer ', '');
-    return this.authService.verifyToken(token);
+  @Roles(UserRole.ADMIN)
+  @Post('api-key/revoke')
+  async revokeApiKey(@GetUser('id') userId: string): Promise<ApiKeyMessageDto> {
+    await this.authService.revokeApiKey(userId);
+    return { message: 'API key revoked successfully' };
   }
 }

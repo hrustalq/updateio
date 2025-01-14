@@ -4,14 +4,24 @@ import { writeFileSync } from 'fs';
 import { join } from 'path';
 import { AppModule } from '../app.module';
 
+const API_VERSION = '1.0.0';
+
 async function generateDocs() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('UpdateIO Telegram Bot')
+    .setTitle('Telegram Bot API')
     .setDescription('The UpdateIO Telegram Bot API description')
-    .setVersion('1.0')
-    .addBearerAuth()
+    .setVersion(API_VERSION)
+    .addApiKey(
+      {
+        type: 'apiKey',
+        name: 'X-API-KEY',
+        in: 'header',
+        description: 'API key for authentication',
+      },
+      'X-API-KEY',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

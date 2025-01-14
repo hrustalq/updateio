@@ -47,23 +47,7 @@ class EnvironmentVariables {
 
   @IsString()
   @IsNotEmpty()
-  JWT_SECRET: string;
-
-  @IsString()
-  @IsNotEmpty()
-  JWT_REFRESH_SECRET: string;
-
-  @IsString()
-  @IsOptional()
-  JWT_ACCESS_EXPIRES_IN: string = '15m';
-
-  @IsString()
-  @IsOptional()
-  JWT_REFRESH_EXPIRES_IN: string = '7d';
-
-  @IsString()
-  @IsOptional()
-  TELEGRAM_BOT_TOKEN: string;
+  DISCORD_BOT_TOKEN: string;
 }
 
 export function validate(config: Record<string, unknown>) {
