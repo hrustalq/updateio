@@ -42,22 +42,22 @@ export class GameProvidersController {
   @ApiOperation({ summary: 'Create a new game provider' })
   @ApiResponse({ type: GameProviderDto, status: 201 })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('imageUrl'))
+  @UseInterceptors(FileInterceptor('image'))
   async create(
     @Body() createGameProviderDto: CreateGameProviderDto,
     @UploadedFile() imageFile?: Express.Multer.File,
   ) {
-    let imageUrl: string | undefined;
+    let image: string | undefined;
 
     if (imageFile) {
       const objectName = `game-providers/${Date.now()}-${imageFile.originalname}`;
       await this.minioService.uploadFile(imageFile, objectName);
-      imageUrl = await this.minioService.getFileUrl(objectName);
+      image = await this.minioService.getFileUrl(objectName);
     }
 
     return this.gameProvidersService.create({
       ...createGameProviderDto,
-      imageUrl,
+      image,
     });
   }
 
@@ -87,7 +87,7 @@ export class GameProvidersController {
   @ApiOperation({ summary: 'Update a game provider' })
   @ApiResponse({ type: GameProviderDto })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('imageUrl'))
+  @UseInterceptors(FileInterceptor('image'))
   async update(
     @Param('id') id: string,
     @Body() updateGameProviderDto: UpdateGameProviderDto,

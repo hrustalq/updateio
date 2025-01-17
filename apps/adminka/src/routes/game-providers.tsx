@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { GameProvider } from '@repo/types'
-import { apiClient } from '@/api'
+import type { GameProvider } from '@repo/types'
+import { gameProviders } from '@repo/api-client'
 import { z } from 'zod'
 
 import {
@@ -27,16 +27,6 @@ export const Route = createFileRoute('/game-providers')({
   component: RouteComponent,
 })
 
-interface PaginatedResponse<T> {
-  data: T[]
-  meta: {
-    total: number
-    page: number
-    limit: number
-    totalPages: number
-  }
-}
-
 function RouteComponent() {
   const { page, limit } = Route.useSearch()
   const [selectedProvider, setSelectedProvider] = useState<GameProvider | undefined>()
@@ -44,29 +34,27 @@ function RouteComponent() {
   const queryClient = useQueryClient()
   const navigate = Route.useNavigate()
 
-  const { data, isLoading } = useQuery<PaginatedResponse<GameProvider>>({
+  const { data, isLoading } = useQuery({
     queryKey: ['game-providers', { page, limit }],
-    queryFn: () => apiClient.get('/v1/game-providers', {
-      params: { page, limit }
-    }).then(res => res.data),
+    queryFn: () => gameProviders.getAll({ page, limit }),
   })
 
   const providers = data?.data ?? []
-  const meta = data?.meta ?? { total: 0, page: 1, limit: 10, totalPages: 1 }
+  const pagination = data?.metadata?.pagination ?? { total: 0, page: 1, limit: 10, totalPages: 1 }
 
   const createMutation = useMutation({
-    mutationFn: (data: Omit<GameProvider, 'id' | 'createdAt' | 'updatedAt'>) =>
-      apiClient.post('/v1/game-providers', data).then(res => res.data),
+    mutationFn: (formData: FormData) => gameProviders.create(formData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['game-providers'] })
+      setIsDialogOpen(false)
     },
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, ...data }: Partial<GameProvider> & { id: string }) =>
-      apiClient.patch(`/v1/game-providers/${id}`, data).then(res => res.data),
+    mutationFn: ({ id, formData }: { id: string; formData: FormData }) => gameProviders.update(id, formData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['game-providers'] })
+      setIsDialogOpen(false)
     },
   })
 
@@ -80,11 +68,11 @@ function RouteComponent() {
     setIsDialogOpen(true)
   }
 
-  const handleSubmit = async (data: Omit<GameProvider, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleSubmit = async (formData: FormData) => {
     if (selectedProvider) {
-      await updateMutation.mutateAsync({ id: selectedProvider.id, ...data })
+      await updateMutation.mutateAsync({ id: selectedProvider.id, formData })
     } else {
-      await createMutation.mutateAsync(data)
+      await createMutation.mutateAsync(formData)
     }
   }
 
@@ -174,7 +162,7 @@ function RouteComponent() {
         <div className="flex items-center justify-between px-4 py-4 border-t bg-white">
           <div className="text-sm text-muted-foreground">
             {providers.length > 0 ? (
-              <>Показано {(meta.page - 1) * meta.limit + 1} - {Math.min(meta.page * meta.limit, meta.total)} из {meta.total}</>
+              <>Показано {(pagination?.page ?? 1) * (pagination?.limit ?? 10) + 1} - {Math.min((pagination?.page ?? 1) * (pagination?.limit ?? 10), pagination?.total ?? 0)} из {pagination?.total ?? 0}</>
             ) : (
               'Нет данных'
             )}
@@ -183,15 +171,15 @@ function RouteComponent() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handlePageChange(meta.page - 1)}
-              disabled={meta.page <= 1 || providers.length === 0}
+              onClick={() => handlePageChange((pagination?.page ?? 1) - 1)}
+              disabled={(pagination?.page ?? 1) <= 1 || providers.length === 0}
             >
               Предыдущая
             </Button>
-            {meta.totalPages > 0 && Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((pageNum) => (
+            {Array.from({ length: pagination?.totalPages ?? 0 }, (_, i) => i + 1).map((pageNum) => (
               <Button
                 key={pageNum}
-                variant={pageNum === meta.page ? "default" : "outline"}
+                variant={pageNum === pagination?.page ? "default" : "outline"}
                 size="sm"
                 onClick={() => handlePageChange(pageNum)}
                 disabled={providers.length === 0}
@@ -202,8 +190,8 @@ function RouteComponent() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handlePageChange(meta.page + 1)}
-              disabled={meta.page >= meta.totalPages || providers.length === 0}
+              onClick={() => handlePageChange((pagination?.page ?? 1) + 1)}
+              disabled={(pagination?.page ?? 1) >= (pagination?.totalPages ?? 1) || providers.length === 0}
             >
               Следующая
             </Button>

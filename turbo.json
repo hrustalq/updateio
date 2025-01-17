@@ -48,6 +48,10 @@
     "db:seed": {
       "cache": false,
       "persistent": false
+    },
+    "clean": {
+      "cache": false,
+      "persistent": false
     }
   }
 }

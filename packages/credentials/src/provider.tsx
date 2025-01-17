@@ -1,17 +1,21 @@
-import { ReactNode } from 'react';
+import React, { useEffect } from 'react';
 import { useAuthStore } from './store';
 
 interface AuthProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
   onAuthStateChange?: (isAuthenticated: boolean) => void;
 }
 
 export function AuthProvider({ children, onAuthStateChange }: AuthProviderProps) {
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-  
-  if (onAuthStateChange) {
-    onAuthStateChange(isAuthenticated);
-  }
+  const { isAuthenticated, initialize } = useAuthStore();
+
+  useEffect(() => {
+    initialize();
+  }, [initialize]);
+
+  useEffect(() => {
+    onAuthStateChange?.(isAuthenticated);
+  }, [isAuthenticated, onAuthStateChange]);
 
   return <>{children}</>;
 } 

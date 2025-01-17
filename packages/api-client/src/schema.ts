@@ -75,6 +75,20 @@ export interface paths {
     /** Update a game */
     patch: operations["GamesV1Controller_update"];
   };
+  "/updates": {
+    /** Get all updates */
+    get: operations["UpdatesV1Controller_findAll"];
+    /** Create a new update */
+    post: operations["UpdatesV1Controller_create"];
+  };
+  "/updates/{id}": {
+    /** Get an update by id */
+    get: operations["UpdatesV1Controller_findOne"];
+    /** Delete an update */
+    delete: operations["UpdatesV1Controller_remove"];
+    /** Update an update */
+    patch: operations["UpdatesV1Controller_update"];
+  };
   "/subscriptions": {
     /** Get all subscriptions */
     get: operations["SubscriptionsV1Controller_findAll"];
@@ -182,7 +196,7 @@ export interface components {
       name: string;
       description: string;
       /** Format: binary */
-      imageUrl?: string;
+      image?: string;
     };
     UpdateGameProviderDto: {
       name?: string;
@@ -405,10 +419,10 @@ export interface components {
        */
       description?: string;
       /**
-       * @description URL to the game image
-       * @example https://example.com/cs2.jpg
+       * Format: binary
+       * @description Game image
        */
-      gameProviderId?: string;
+      image?: string;
       /**
        * @description External ID of the game (e.g. Steam App ID)
        * @example 730
@@ -425,6 +439,72 @@ export interface components {
       description?: string;
       gameProviderId?: string;
       imageUrl?: string;
+    };
+    UpdateDto: {
+      /**
+       * @description The unique identifier of the update
+       * @example clrk2345600000123jk5678
+       */
+      id: string;
+      /**
+       * @description The version of the update
+       * @example 1.0.0
+       */
+      version?: string;
+      /**
+       * @description The content of the update
+       * @example Added new features and fixed bugs
+       */
+      content?: string;
+      /**
+       * @description ID of the game this update belongs to
+       * @example clrk2345600000123jk5679
+       */
+      gameId: string;
+      /**
+       * Format: date-time
+       * @description Creation timestamp
+       */
+      createdAt: string;
+      /**
+       * Format: date-time
+       * @description Last update timestamp
+       */
+      updatedAt: string;
+    };
+    CreateUpdateDto: {
+      /**
+       * @description The version of the update
+       * @example 1.0.0
+       */
+      version?: string;
+      /**
+       * @description The content of the update
+       * @example Added new features and fixed bugs
+       */
+      content?: string;
+      /**
+       * @description ID of the game this update belongs to
+       * @example clrk2345600000123jk5679
+       */
+      gameId: string;
+    };
+    UpdateUpdateDto: {
+      /**
+       * @description The version of the update
+       * @example 1.0.0
+       */
+      version?: string;
+      /**
+       * @description The content of the update
+       * @example Added new features and fixed bugs
+       */
+      content?: string;
+      /**
+       * @description ID of the game this update belongs to
+       * @example clrk2345600000123jk5679
+       */
+      gameId?: string;
     };
     SubscriptionDto: {
       /**
@@ -698,7 +778,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.380Z
+               * @example 2025-01-17T13:25:41.664Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -824,7 +904,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.380Z
+               * @example 2025-01-17T13:25:41.664Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -918,7 +998,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.381Z
+               * @example 2025-01-17T13:25:41.664Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -1012,7 +1092,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.381Z
+               * @example 2025-01-17T13:25:41.665Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -1111,7 +1191,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.381Z
+               * @example 2025-01-17T13:25:41.664Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -1200,7 +1280,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.166Z
+               * @example 2025-01-17T13:25:41.502Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/me */
@@ -1289,7 +1369,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.166Z
+               * @example 2025-01-17T13:25:41.503Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/token/refresh */
@@ -1383,7 +1463,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.167Z
+               * @example 2025-01-17T13:25:41.503Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/login */
@@ -1477,7 +1557,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.167Z
+               * @example 2025-01-17T13:25:41.503Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/telegram/login */
@@ -1571,7 +1651,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.167Z
+               * @example 2025-01-17T13:25:41.503Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/logout */
@@ -1665,7 +1745,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.167Z
+               * @example 2025-01-17T13:25:41.504Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/verify */
@@ -1754,7 +1834,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.185Z
+               * @example 2025-01-17T13:25:41.521Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -1880,7 +1960,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.185Z
+               * @example 2025-01-17T13:25:41.521Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -1974,7 +2054,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.185Z
+               * @example 2025-01-17T13:25:41.521Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2068,7 +2148,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.185Z
+               * @example 2025-01-17T13:25:41.521Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2162,7 +2242,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.186Z
+               * @example 2025-01-17T13:25:41.521Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2261,7 +2341,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.186Z
+               * @example 2025-01-17T13:25:41.521Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2360,7 +2440,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.421Z
+               * @example 2025-01-17T13:25:41.702Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2486,7 +2566,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.421Z
+               * @example 2025-01-17T13:25:41.702Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2580,7 +2660,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.421Z
+               * @example 2025-01-17T13:25:41.702Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2674,7 +2754,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.421Z
+               * @example 2025-01-17T13:25:41.703Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2773,7 +2853,521 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.421Z
+               * @example 2025-01-17T13:25:41.703Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get all updates */
+  UpdatesV1Controller_findAll: {
+    parameters: {
+      query?: {
+        /** @description Page number (starts from 1) */
+        page?: number;
+        /** @description Number of items per page */
+        limit?: number;
+        /** @description Sorting criteria (format: field:order,field2:order2) */
+        sort?: string[];
+        /** @description Filter updates by game ID */
+        gameId?: string;
+      };
+    };
+    responses: {
+      /** @description Returns all updates */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UpdateDto"][];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-17T13:25:41.728Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+              pagination?: {
+                /**
+                 * @description Total number of items
+                 * @example 100
+                 */
+                total?: number;
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description Items per page
+                 * @example 10
+                 */
+                limit?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 10
+                 */
+                totalPages?: number;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPreviousPage?: boolean;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNextPage?: boolean;
+              };
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Create a new update */
+  UpdatesV1Controller_create: {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateUpdateDto"];
+      };
+    };
+    responses: {
+      /** @description Successful response with metadata */
+      201: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UpdateDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-17T13:25:41.727Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get an update by id */
+  UpdatesV1Controller_findOne: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Returns the update */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UpdateDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-17T13:25:41.728Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Delete an update */
+  UpdatesV1Controller_remove: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description The update has been successfully deleted. */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UpdateDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-17T13:25:41.728Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Update an update */
+  UpdatesV1Controller_update: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateUpdateDto"];
+      };
+    };
+    responses: {
+      /** @description The update has been successfully updated. */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UpdateDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-17T13:25:41.728Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2868,7 +3462,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.440Z
+               * @example 2025-01-17T13:25:41.749Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2994,7 +3588,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.440Z
+               * @example 2025-01-17T13:25:41.749Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3088,7 +3682,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.440Z
+               * @example 2025-01-17T13:25:41.749Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3182,7 +3776,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.440Z
+               * @example 2025-01-17T13:25:41.750Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3281,7 +3875,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.440Z
+               * @example 2025-01-17T13:25:41.750Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3376,7 +3970,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.466Z
+               * @example 2025-01-17T13:25:41.772Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3502,7 +4096,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.466Z
+               * @example 2025-01-17T13:25:41.772Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3596,7 +4190,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.466Z
+               * @example 2025-01-17T13:25:41.772Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3690,7 +4284,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.466Z
+               * @example 2025-01-17T13:25:41.772Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3789,7 +4383,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.466Z
+               * @example 2025-01-17T13:25:41.772Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3883,7 +4477,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.484Z
+               * @example 2025-01-17T13:25:41.793Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4009,7 +4603,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.484Z
+               * @example 2025-01-17T13:25:41.793Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4103,7 +4697,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.484Z
+               * @example 2025-01-17T13:25:41.793Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4197,7 +4791,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.485Z
+               * @example 2025-01-17T13:25:41.793Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4296,7 +4890,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.484Z
+               * @example 2025-01-17T13:25:41.793Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4390,7 +4984,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.502Z
+               * @example 2025-01-17T13:25:41.813Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4516,7 +5110,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.502Z
+               * @example 2025-01-17T13:25:41.812Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4610,7 +5204,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.502Z
+               * @example 2025-01-17T13:25:41.813Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4704,7 +5298,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.502Z
+               * @example 2025-01-17T13:25:41.813Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4803,7 +5397,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-14T18:09:56.502Z
+               * @example 2025-01-17T13:25:41.813Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */

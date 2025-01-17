@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { auth, gameProviders, games, notifications, updateCommands } from './client'
+import { auth, gameProviders, games, notifications, updateCommands, updates } from './client'
 import useSWR from 'swr'
 
 // Auth hooks
@@ -118,5 +118,39 @@ export const useUpdateCommands = (params: { gameId: string }) => {
 export const useUpdateCommand = () => {
   return useMutation({
     mutationFn: updateCommands.create,
+  })
+}
+
+// Updates hooks
+export const useUpdates = (params?: Parameters<typeof updates.getAll>[0]) => {
+  return useQuery({
+    queryKey: ['updates', params],
+    queryFn: () => updates.getAll(params),
+  })
+}
+
+export const useUpdate = (id: string) => {
+  return useQuery({
+    queryKey: ['update', id],
+    queryFn: () => updates.getById(id),
+  })
+}
+
+export const useCreateUpdate = () => {
+  return useMutation({
+    mutationFn: updates.create,
+  })
+}
+
+export const useUpdateUpdate = () => {
+  return useMutation({
+    mutationFn: ({ id, ...data }: Parameters<typeof updates.update>[1] & { id: string }) =>
+      updates.update(id, data),
+  })
+}
+
+export const useDeleteUpdate = () => {
+  return useMutation({
+    mutationFn: updates.delete,
   })
 } 

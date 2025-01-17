@@ -24,6 +24,7 @@ import { GlobalAuthGuard } from './common/guards/global-auth.guard';
 import { PrismaModule } from './common/modules/prisma/prisma.module';
 import { GameProvidersModule } from './domains/game-providers/game-providers.module';
 import { GamesModule } from './domains/games/games.module';
+import { UpdatesModule } from './domains/updates/updates.module';
 import { SubscriptionsModule } from './domains/subscriptions/subscriptions.module';
 import { NotificationsModule } from './domains/notifications/notifications.module';
 import { ReportsModule } from './domains/reports/reports.module';
@@ -43,6 +44,7 @@ import { UpdateCommandsModule } from './domains/update-commands/update-commands.
     GameProvidersModule,
     AuthModule,
     GamesModule,
+    UpdatesModule,
     SubscriptionsModule,
     NotificationsModule,
     ReportsModule,

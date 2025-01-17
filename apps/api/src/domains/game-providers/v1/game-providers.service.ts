@@ -14,8 +14,12 @@ export class GameProvidersService {
   async create(
     createGameProviderDto: CreateGameProviderDto,
   ): Promise<GameProvider> {
+    const { image, ...rest } = createGameProviderDto;
     return this.prisma.gameProvider.create({
-      data: createGameProviderDto,
+      data: {
+        ...rest,
+        imageUrl: image,
+      },
     });
   }
 

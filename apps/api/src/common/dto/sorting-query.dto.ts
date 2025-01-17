@@ -1,25 +1,38 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, Matches } from 'class-validator';
+import { IsArray, IsOptional, ValidateIf } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { SortOption, SortOrder } from '../interfaces/sorting.interface';
 
 export class SortingQueryDto<T> {
   @ApiPropertyOptional({
-    description: 'Sorting criteria (format: field:order,field2:order2)',
-    example: 'name:ASC,createdAt:DESC',
+    description: 'Sorting criteria in array format',
+    example: ['name:ASC', 'createdAt:DESC'],
+    type: [String],
   })
   @IsOptional()
-  @IsString()
-  @Matches(/^[a-zA-Z]+(:(ASC|DESC))?(,[a-zA-Z]+(:(ASC|DESC))?)*$/, {
-    message: 'Invalid sort format. Example: field:ASC,field2:DESC',
-  })
+  @IsArray()
+  @ValidateIf((_, value) => Array.isArray(value))
   @Transform(({ value }) => {
+    if (!Array.isArray(value)) {
+      return undefined;
+    }
+    const pattern = /^[a-zA-Z]+:(ASC|DESC)$/;
+    const validItems = value.map(String).filter((item) => pattern.test(item));
+
+    if (validItems.length !== value.length) {
+      throw new Error(
+        'Invalid sort format. Each element should be in format: field:ASC or field:DESC',
+      );
+    }
+
+    return validItems;
+  })
+  @Transform(({ value }: { value: Array<keyof T> }) => {
     if (!value) return undefined;
     return value
-      .split(',')
-      .map((sort: string) => {
-        const [field, order = 'ASC'] = sort.split(':');
-        return { field, order: order as SortOrder };
+      .map((sort: keyof T) => {
+        const [field, order = 'asc'] = sort.toString().split(':');
+        return { field: field as keyof T, order: order as SortOrder };
       })
       .filter((sort: SortOption<T>) => sort.field);
   })

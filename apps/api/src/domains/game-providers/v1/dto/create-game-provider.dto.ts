@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateGameProviderDto {
   @ApiProperty()
@@ -9,9 +9,9 @@ export class CreateGameProviderDto {
 
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
-  description: string;
+  @IsOptional()
+  description?: string;
 
-  @ApiProperty({ type: 'string', format: 'binary', required: false })
-  imageUrl?: string;
+  @ApiProperty({ format: 'binary', required: false })
+  image?: string;
 }

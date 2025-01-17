@@ -189,10 +189,12 @@ export class AuthService {
   }
 
   private setRefreshTokenCookie(res: Response, token: string): void {
+    const isDev = this.configService.get('NODE_ENV') === 'development';
+
     res.cookie(this.REFRESH_COOKIE_NAME, token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
+      secure: true,
+      sameSite: isDev ? 'none' : 'lax',
       expires: new Date(
         Date.now() +
           TimeUtil.parseDuration(
@@ -202,16 +204,18 @@ export class AuthService {
       maxAge: TimeUtil.parseDuration(
         this.configService.get('auth.jwt.refreshExpiresIn'),
       ),
-      path: '/auth/refresh', // Only send cookie to refresh endpoint
+      path: '/', // Allow cookie for all paths in development
     });
   }
 
   private clearRefreshTokenCookie(res: Response): void {
+    const isDev = this.configService.get('NODE_ENV') === 'development';
+
     res.clearCookie(this.REFRESH_COOKIE_NAME, {
       httpOnly: true,
       secure: true,
-      sameSite: 'lax',
-      path: '/auth/refresh',
+      sameSite: isDev ? 'none' : 'lax',
+      path: '/',
     });
   }
 

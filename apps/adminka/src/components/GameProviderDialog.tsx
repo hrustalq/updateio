@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@repo/ui/components/dialog'
 import { Button } from '@repo/ui/components/button'
 import {
@@ -23,19 +24,20 @@ import { Input } from '@repo/ui/components/input'
 import { Textarea } from '@repo/ui/components/textarea'
 import { GameProvider } from '@repo/types'
 
-const gameProviderFormSchema = z.object({
+const formSchema = z.object({
   name: z.string().min(1, 'Название обязательно'),
-  description: z.string().nullable(),
-  imageUrl: z.string().url('Должен быть валидный URL').nullable(),
+  description: z.string().optional(),
+  image: z.instanceof(File).optional(),
 })
 
-type GameProviderFormValues = z.infer<typeof gameProviderFormSchema>
+
+type FormValues = z.infer<typeof formSchema>
 
 interface GameProviderDialogProps {
   gameProvider?: GameProvider
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSubmit: (data: GameProviderFormValues) => Promise<void>
+  onSubmit: (data: FormData) => Promise<void>
 }
 
 export default function GameProviderDialog({
@@ -46,23 +48,28 @@ export default function GameProviderDialog({
 }: GameProviderDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const form = useForm<GameProviderFormValues>({
-    resolver: zodResolver(gameProviderFormSchema),
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       name: gameProvider?.name ?? '',
       description: gameProvider?.description ?? '',
-      imageUrl: gameProvider?.imageUrl ?? '',
     },
   })
 
-  const handleSubmit = async (data: GameProviderFormValues) => {
+  const handleSubmit = async (values: FormValues) => {
     try {
       setIsSubmitting(true)
-      await onSubmit(data)
+      const formData = new FormData()
+      
+      if (values.name) formData.append('name', values.name)
+      if (values.description) formData.append('description', values.description)
+      if (values.image) formData.append('image', values.image)
+
+      await onSubmit(formData)
       onOpenChange(false)
       form.reset()
     } catch (error) {
-      console.error('Failed to submit game provider:', error)
+      console.error('Failed to create game provider:', error)
     } finally {
       setIsSubmitting(false)
     }
@@ -75,6 +82,12 @@ export default function GameProviderDialog({
           <DialogTitle>
             {gameProvider ? 'Редактировать провайдера' : 'Создать провайдера'}
           </DialogTitle>
+          <DialogDescription>
+            {gameProvider 
+              ? 'Измените данные провайдера игр' 
+              : 'Заполните данные для нового провайдера игр'
+            }
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -110,24 +123,29 @@ export default function GameProviderDialog({
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="imageUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL изображения</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Введите URL изображения"
-                      {...field}
-                      value={field.value ?? ''}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field: { value, onChange, ...field } }) => (
+                  <FormItem>
+                    <FormLabel>Изображение</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) {
+                            onChange(file)
+                          }
+                        }}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
             <DialogFooter>
               <Button

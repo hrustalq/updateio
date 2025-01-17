@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "lint": "eslint . --max-warnings 0"
+    "lint": "eslint . --max-warnings 0",
+    "clean": "rm -rf dist && rm -rf .turbo"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",

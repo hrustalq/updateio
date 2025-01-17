@@ -13,10 +13,11 @@
     "lint": "eslint src/",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "type-check": "tsc --noEmit",
-    "generate-types": "openapi-typescript http://localhost:3000/swagger.json --output ./src/schema.ts"
+    "generate-types": "NODE_TLS_REJECT_UNAUTHORIZED=0 openapi-typescript https://localhost:3000/swagger.json --output ./src/schema.ts"
   },
   "dependencies": {
     "@repo/shared": "workspace:*",
+    "@repo/auth-store": "workspace:*",
     "@tanstack/react-query": "^5.17.9",
     "axios": "^1.6.5",
     "swr": "^2.2.4",

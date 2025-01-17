@@ -1,81 +1,123 @@
-# Turborepo starter
+# UpdateIO
 
-This is an official starter Turborepo.
+Система для автоматизации обновлений игр, включающая мониторинг Discord каналов, уведомления пользователей через Telegram и автоматическое обновление клиентских приложений.
 
-## Using this example
+## Возможности
 
-Run the following command:
+- 🎮 Мониторинг обновлений игр через Discord
+- 📱 Уведомления пользователей через Telegram
+- 🔄 Автоматическое обновление игр
+- 💳 Система подписок
+- 👥 Управление пользователями
+- 📊 Мониторинг и аналитика
 
-```sh
-npx create-turbo@latest
+## Быстрый Старт
+
+### Требования
+
+- Node.js 18+
+- pnpm 8+
+- Docker и Docker Compose
+- PostgreSQL 15+
+- Redis 7+
+- Kafka 3+
+
+### Установка
+
+1. Клонируйте репозиторий:
+```bash
+git clone https://github.com/your-username/updateio.git
+cd updateio
 ```
 
-## What's inside?
-
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm build
+2. Установите зависимости:
+```bash
+pnpm install
 ```
 
-### Develop
-
-To develop all apps and packages, run the following command:
-
+3. Настройте переменные окружения:
+```bash
+cp .env.example .env
+# Отредактируйте .env файл, добавив необходимые ключи API и настройки
 ```
-cd my-turborepo
+
+4. Запустите инфраструктуру:
+```bash
+cd infrastructure/docker
+docker-compose up -d
+```
+
+5. Запустите приложения:
+```bash
 pnpm dev
 ```
 
-### Remote Caching
-
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
+## Структура Проекта
 
 ```
-cd my-turborepo
-npx turbo login
+updateio/
+├── apps/                      # Приложения
+│   ├── api/                   # API сервис (NestJS)
+│   ├── discord-bot/           # Discord бот
+│   ├── tg-bot/               # Telegram бот
+│   ├── adminka/              # Админ панель
+│   └── tg-miniapp/           # Telegram мини-приложение
+├── packages/                  # Общие пакеты
+│   ├── api-client/           # Типизированный API клиент
+│   ├── auth/                 # Аутентификация и авторизация
+│   ├── auth-store/           # Хранилище состояния auth
+│   ├── credentials/          # Управление учетными данными
+│   ├── database/             # Общие компоненты БД
+│   ├── shared/               # Общие утилиты
+│   ├── types/                # Общие типы
+│   ├── ui/                   # UI компоненты
+│   └── config/               # Конфигурации (ESLint, TypeScript)
+├── infrastructure/           # Docker конфигурации
+└── docs/                     # Документация
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## Документация
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+### Приложения
+- [API Сервис](docs/apps/api/README.md)
+- [Discord Бот](docs/apps/discord-bot/README.md)
+- [Telegram Бот](docs/apps/tg-bot/README.md)
+- [Админ Панель](docs/apps/adminka/README.md)
+- [Telegram Мини-Приложение](docs/apps/tg-miniapp/README.md)
 
-```
-npx turbo link
-```
+### Пакеты
+- [API Client](docs/packages/api-client/README.md)
+- [Auth](docs/packages/auth/README.md)
+- [Auth Store](docs/packages/auth-store/README.md)
+- [Credentials](docs/packages/credentials/README.md)
+- [Database](docs/packages/database/README.md)
+- [Shared](docs/packages/shared/README.md)
+- [Types](docs/packages/types/README.md)
+- [UI](docs/packages/ui/README.md)
 
-## Useful Links
+### Сценарии Использования
+- [Процесс Обновления Игры](docs/use-cases/game-update-flow/README.md)
 
-Learn more about the power of Turborepo:
+### Инфраструктура
+- [Развертывание и Конфигурация](docs/infrastructure/README.md)
 
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+## Разработка
+
+### Команды
+
+- `pnpm dev` - Запуск всех приложений в режиме разработки
+- `pnpm build` - Сборка всех приложений
+- `pnpm test` - Запуск тестов
+- `pnpm lint` - Проверка кода
+- `pnpm format` - Форматирование кода
+
+### Рабочий Процесс
+
+1. Создайте ветку для новой функциональности
+2. Внесите изменения
+3. Убедитесь, что все тесты проходят
+4. Создайте Pull Request
+
+## Лицензия
+
+MIT

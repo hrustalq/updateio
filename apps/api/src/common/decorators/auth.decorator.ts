@@ -25,7 +25,9 @@ export function Auth(options: AuthOptions = {}) {
 
   switch (type) {
     case AuthType.Bearer:
-      decorators.push(ApiBearerAuth(), UseGuards(JwtGuard));
+      if (!isPublic) {
+        decorators.push(ApiBearerAuth(), UseGuards(JwtGuard));
+      }
       break;
     case AuthType.Local:
       decorators.push(UseGuards(LocalGuard));

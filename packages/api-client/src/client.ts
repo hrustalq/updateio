@@ -1,7 +1,6 @@
 import axios from 'axios'
 import type { paths } from './schema'
-import type { AuthState } from '@repo/shared'
-import { create } from 'zustand'
+import { useAuthStore } from '@repo/auth-store'
 
 const getEnvVar = (key: string): string | undefined => {
   // Vite environment
@@ -22,11 +21,6 @@ const getEnvVar = (key: string): string | undefined => {
 // Default API URL if environment variables are not set
 const DEFAULT_API_URL = getEnvVar('FALLBACK_API_URL');
 
-// Create a minimal auth store just for token management
-const useTokenStore = create<Pick<AuthState, 'accessToken'>>((set) => ({
-  accessToken: null,
-}))
-
 export const apiClient = axios.create({
   baseURL: `${getEnvVar('VITE_API_URL') || getEnvVar('NEXT_PUBLIC_API_URL') || DEFAULT_API_URL}/v1`,
   withCredentials: true,
@@ -34,7 +28,7 @@ export const apiClient = axios.create({
 
 // Add auth header interceptor
 apiClient.interceptors.request.use((config) => {
-  const accessToken = useTokenStore.getState().accessToken
+  const accessToken = useAuthStore.getState().accessToken
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`
   }
@@ -67,12 +61,12 @@ apiClient.interceptors.response.use(
         }
         const { access_token: accessToken } = data
 
-        useTokenStore.getState().accessToken = accessToken
+        useAuthStore.getState().setAccessToken(accessToken)
         originalRequest.headers.Authorization = `Bearer ${accessToken}`
         return apiClient(originalRequest)
       } catch (refreshError) {
         // Clear token and reject with original error
-        useTokenStore.getState().accessToken = null
+        useAuthStore.getState().setAccessToken(null)
         return Promise.reject(error)
       }
     }
@@ -85,7 +79,7 @@ apiClient.interceptors.response.use(
 export const auth = {
   login: async (credentials: paths['/auth/login']['post']['requestBody']['content']['application/json']) => {
     const response = await apiClient.post<paths['/auth/login']['post']['responses']['201']['content']['application/json']>('/auth/login', credentials)
-    useTokenStore.getState().accessToken = response.data.data?.access_token ?? null
+    useAuthStore.getState().setAccessToken(response.data.data?.access_token ?? null)
     return response.data
   },
 
@@ -96,6 +90,7 @@ export const auth = {
 
   logout: async () => {
     await apiClient.post('/auth/logout')
+    useAuthStore.getState().setAccessToken(null)
   },
 
   verify: async (token: string) => {
@@ -110,14 +105,17 @@ export const auth = {
 
   refreshToken: async () => {
     const response = await apiClient.post<paths['/auth/token/refresh']['post']['responses']['201']['content']['application/json']>('/auth/token/refresh')
+    if (response.data.data?.access_token) {
+      useAuthStore.getState().setAccessToken(response.data.data.access_token)
+    }
     return response.data
   },
 }
 
 // Users endpoints
 export const users = {
-  getAll: async () => {
-    const response = await apiClient.get<paths['/users']['get']['responses']['200']['content']['application/json']>('/users')
+  getAll: async (params?: { page?: number; limit?: number }) => {
+    const response = await apiClient.get<paths['/users']['get']['responses']['200']['content']['application/json']>('/users', { params })
     return response.data
   },
 
@@ -158,12 +156,12 @@ export const gameProviders = {
     return response.data
   },
 
-  create: async (data: paths['/game-providers']['post']['requestBody']['content']['multipart/form-data']) => {
+  create: async (data: FormData) => {
     const response = await apiClient.post<paths['/game-providers']['post']['responses']['201']['content']['application/json']>('/game-providers', data)
     return response.data
   },
 
-  update: async (id: string, data: paths['/game-providers/{id}']['patch']['requestBody']['content']['multipart/form-data']) => {
+  update: async (id: string, data: FormData) => {
     const response = await apiClient.patch<paths['/game-providers/{id}']['patch']['responses']['200']['content']['application/json']>(`/game-providers/${id}`, data)
     return response.data
   },
@@ -185,12 +183,12 @@ export const games = {
     return response.data
   },
 
-  create: async (data: paths['/games']['post']['requestBody']['content']['multipart/form-data']) => {
+  create: async (data: FormData) => {
     const response = await apiClient.post<paths['/games']['post']['responses']['201']['content']['application/json']>('/games', data)
     return response.data
   },
 
-  update: async (id: string, data: paths['/games/{id}']['patch']['requestBody']['content']['multipart/form-data']) => {
+  update: async (id: string, data: FormData) => {
     const response = await apiClient.patch<paths['/games/{id}']['patch']['responses']['200']['content']['application/json']>(`/games/${id}`, data)
     return response.data
   },
@@ -305,6 +303,33 @@ export const updateCommands = {
 
   delete: async (id: string) => {
     await apiClient.delete(`/update-commands/${id}`)
+  },
+}
+
+// Updates endpoints
+export const updates = {
+  getAll: async (params?: paths['/updates']['get']['parameters']['query']) => {
+    const response = await apiClient.get<paths['/updates']['get']['responses']['200']['content']['application/json']>('/updates', { params })
+    return response.data
+  },
+
+  getById: async (id: string) => {
+    const response = await apiClient.get<paths['/updates/{id}']['get']['responses']['200']['content']['application/json']>(`/updates/${id}`)
+    return response.data
+  },
+
+  create: async (data: paths['/updates']['post']['requestBody']['content']['application/json']) => {
+    const response = await apiClient.post<paths['/updates']['post']['responses']['201']['content']['application/json']>('/updates', data)
+    return response.data
+  },
+
+  update: async (id: string, data: paths['/updates/{id}']['patch']['requestBody']['content']['application/json']) => {
+    const response = await apiClient.patch<paths['/updates/{id}']['patch']['responses']['200']['content']['application/json']>(`/updates/${id}`, data)
+    return response.data
+  },
+
+  delete: async (id: string) => {
+    await apiClient.delete(`/updates/${id}`)
   },
 }
 

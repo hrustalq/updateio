@@ -20,13 +20,11 @@ export class CreateGameDto {
   description?: string;
 
   @ApiProperty({
-    description: 'URL to the game image',
-    example: 'https://example.com/cs2.jpg',
+    description: 'Game image',
     required: false,
+    format: 'binary',
   })
-  @IsString()
-  @IsNotEmpty()
-  gameProviderId: string;
+  image?: string;
 
   @ApiProperty({
     description: 'External ID of the game (e.g. Steam App ID)',

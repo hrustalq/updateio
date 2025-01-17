@@ -42,7 +42,9 @@ if (!rootElement.innerHTML) {
         <AuthProvider
           onAuthStateChange={(isAuthenticated) => {
             console.log('Auth state changed:', isAuthenticated)
-            if (!isAuthenticated) {
+            if (isAuthenticated) {
+              router.navigate({ to: '/' })
+            } else {
               router.navigate({ to: '/login' })
             }
           }}

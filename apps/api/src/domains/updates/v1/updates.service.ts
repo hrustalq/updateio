@@ -2,6 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../common/modules/prisma/prisma.service';
 import { CreateUpdateDto } from './dto/create-update.dto';
 import { UpdateUpdateDto } from './dto/update-update.dto';
+import { SortingQueryDto } from 'src/common/dto/sorting-query.dto';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { GetUpdatesPaginatedItemDto } from './dto/get-updates-paginated-item.dto';
+import { Prisma } from '@repo/database';
+import { PaginationHelper } from '../../../common/helpers/pagination.helper';
 
 @Injectable()
 export class UpdatesV1Service {
@@ -16,11 +21,32 @@ export class UpdatesV1Service {
     });
   }
 
-  async findAll() {
-    return this.prisma.gameUpdate.findMany({
-      include: {
-        game: true,
-      },
+  async findAll(
+    { page = 1, limit = 10 }: PaginationQueryDto,
+    { sort }: SortingQueryDto<GetUpdatesPaginatedItemDto>,
+  ) {
+    const orderBy: Prisma.GameOrderByWithRelationInput[] =
+      sort?.map(({ field, order }) => ({
+        [field]: order.toLowerCase(),
+      })) || [];
+
+    const [total, items] = await Promise.all([
+      this.prisma.gameUpdate.count(),
+      this.prisma.gameUpdate.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy,
+        include: {
+          game: true,
+        },
+      }),
+    ]);
+
+    return PaginationHelper.paginate(items, {
+      page,
+      limit,
+      total,
+      sort,
     });
   }
 

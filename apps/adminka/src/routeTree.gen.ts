@@ -14,7 +14,6 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as UsersImport } from './routes/users'
-import { Route as UpdatesImport } from './routes/updates'
 import { Route as UnauthorizedImport } from './routes/unauthorized'
 import { Route as SettingsImport } from './routes/settings'
 import { Route as MessagesImport } from './routes/messages'
@@ -38,12 +37,6 @@ const AboutLazyRoute = AboutLazyImport.update({
 const UsersRoute = UsersImport.update({
   id: '/users',
   path: '/users',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const UpdatesRoute = UpdatesImport.update({
-  id: '/updates',
-  path: '/updates',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -142,13 +135,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnauthorizedImport
       parentRoute: typeof rootRoute
     }
-    '/updates': {
-      id: '/updates'
-      path: '/updates'
-      fullPath: '/updates'
-      preLoaderRoute: typeof UpdatesImport
-      parentRoute: typeof rootRoute
-    }
     '/users': {
       id: '/users'
       path: '/users'
@@ -176,7 +162,6 @@ export interface FileRoutesByFullPath {
   '/messages': typeof MessagesRoute
   '/settings': typeof SettingsRoute
   '/unauthorized': typeof UnauthorizedRoute
-  '/updates': typeof UpdatesRoute
   '/users': typeof UsersRoute
   '/about': typeof AboutLazyRoute
 }
@@ -189,7 +174,6 @@ export interface FileRoutesByTo {
   '/messages': typeof MessagesRoute
   '/settings': typeof SettingsRoute
   '/unauthorized': typeof UnauthorizedRoute
-  '/updates': typeof UpdatesRoute
   '/users': typeof UsersRoute
   '/about': typeof AboutLazyRoute
 }
@@ -203,7 +187,6 @@ export interface FileRoutesById {
   '/messages': typeof MessagesRoute
   '/settings': typeof SettingsRoute
   '/unauthorized': typeof UnauthorizedRoute
-  '/updates': typeof UpdatesRoute
   '/users': typeof UsersRoute
   '/about': typeof AboutLazyRoute
 }
@@ -218,7 +201,6 @@ export interface FileRouteTypes {
     | '/messages'
     | '/settings'
     | '/unauthorized'
-    | '/updates'
     | '/users'
     | '/about'
   fileRoutesByTo: FileRoutesByTo
@@ -230,7 +212,6 @@ export interface FileRouteTypes {
     | '/messages'
     | '/settings'
     | '/unauthorized'
-    | '/updates'
     | '/users'
     | '/about'
   id:
@@ -242,7 +223,6 @@ export interface FileRouteTypes {
     | '/messages'
     | '/settings'
     | '/unauthorized'
-    | '/updates'
     | '/users'
     | '/about'
   fileRoutesById: FileRoutesById
@@ -256,7 +236,6 @@ export interface RootRouteChildren {
   MessagesRoute: typeof MessagesRoute
   SettingsRoute: typeof SettingsRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
-  UpdatesRoute: typeof UpdatesRoute
   UsersRoute: typeof UsersRoute
   AboutLazyRoute: typeof AboutLazyRoute
 }
@@ -269,7 +248,6 @@ const rootRouteChildren: RootRouteChildren = {
   MessagesRoute: MessagesRoute,
   SettingsRoute: SettingsRoute,
   UnauthorizedRoute: UnauthorizedRoute,
-  UpdatesRoute: UpdatesRoute,
   UsersRoute: UsersRoute,
   AboutLazyRoute: AboutLazyRoute,
 }
@@ -291,7 +269,6 @@ export const routeTree = rootRoute
         "/messages",
         "/settings",
         "/unauthorized",
-        "/updates",
         "/users",
         "/about"
       ]
@@ -316,9 +293,6 @@ export const routeTree = rootRoute
     },
     "/unauthorized": {
       "filePath": "unauthorized.tsx"
-    },
-    "/updates": {
-      "filePath": "updates.tsx"
     },
     "/users": {
       "filePath": "users.tsx"

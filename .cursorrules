@@ -29,7 +29,6 @@ Technologies:
   Api:
     - NestJS
     - TypeScript
-    - tRPC
     - zod
     - Prisma (distributed as turborepo package)
     - PostgreSQL (accessible via docker)
@@ -42,27 +41,23 @@ Technologies:
   Discord bot:
     - discord.js
     - TypeScript
-    - tRPC
     - zod
 
   Telegram bot:
     - Telegraf
     - TypeScript
-    - tRPC
     - zod
 
   Admin panel:
     - React
     - Vite
     - TypeScript
-    - tRPC
     - zod
 
   Telegram mini app:
     - React
     - Vite
     - TypeScript
-    - tRPC
     - zod
 
 Good to know:

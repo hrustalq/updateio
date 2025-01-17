@@ -18,10 +18,15 @@ export class GlobalAuthGuard extends AuthGuard('jwt') {
   canActivate(context: ExecutionContext) {
     this.executionContext = context;
 
+    // Check if route is public
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
+
+    if (isPublic) {
+      return true;
+    }
 
     // Check if route has specific guards
     const guards = this.reflector.getAllAndOverride<any[]>('__guards__', [
@@ -29,8 +34,7 @@ export class GlobalAuthGuard extends AuthGuard('jwt') {
       context.getClass(),
     ]);
 
-    // Skip if route is public or has specific guards
-    if (isPublic || guards?.length) {
+    if (guards?.length) {
       return true;
     }
 

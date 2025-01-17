@@ -12,12 +12,13 @@ import { Prisma } from '@repo/database';
 export class GamesV1Service {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createGameDto: CreateGameDto & { imageUrl?: string }) {
-    const { gameProviderId, ...rest } = createGameDto;
+  async create(createGameDto: CreateGameDto) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { image, ...rest } = createGameDto;
     return this.prisma.game.create({
       data: {
         ...rest,
-        providerId: gameProviderId,
+        imageUrl: image,
       },
       include: {
         provider: true,

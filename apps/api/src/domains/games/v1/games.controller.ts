@@ -42,7 +42,7 @@ export class GamesV1Controller {
   @ApiOperation({ summary: 'Create a new game' })
   @ApiResponse({ type: GameDto, status: 201 })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('imageUrl'))
+  @UseInterceptors(FileInterceptor('image'))
   async create(
     @Body() createGameDto: CreateGameDto,
     @UploadedFile() imageFile?: Express.Multer.File,
@@ -57,7 +57,7 @@ export class GamesV1Controller {
 
     return this.gamesService.create({
       ...createGameDto,
-      imageUrl,
+      image: imageUrl,
     });
   }
 
@@ -87,7 +87,7 @@ export class GamesV1Controller {
   @ApiOperation({ summary: 'Update a game' })
   @ApiResponse({ type: GameDto })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('imageUrl'))
+  @UseInterceptors(FileInterceptor('image'))
   async update(
     @Param('id') id: string,
     @Body() updateGameDto: UpdateGameDto,

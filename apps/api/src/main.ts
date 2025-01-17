@@ -13,9 +13,39 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 
 import { swaggerConfig, swaggerOptions } from './swagger/swagger.config';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { existsSync } from 'fs';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const isDev = process.env.NODE_ENV === 'development';
+
+  // SSL configuration for local development only
+  // In production, SSL should be handled by Nginx
+  let httpsOptions = null;
+  if (isDev) {
+    const keyPath = join(__dirname, '../ssl/key.pem');
+    const certPath = join(__dirname, '../ssl/cert.pem');
+
+    if (existsSync(keyPath) && existsSync(certPath)) {
+      httpsOptions = {
+        key: readFileSync(keyPath),
+        cert: readFileSync(certPath),
+      };
+      Logger.debug(
+        'SSL certificates found, HTTPS will be enabled for development',
+      );
+    } else {
+      Logger.warn('SSL certificates not found, HTTPS will not be enabled');
+      Logger.warn(
+        'Cookie-based auth features may not work properly without HTTPS',
+      );
+    }
+  }
+
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    ...(httpsOptions && { httpsOptions }),
+  });
 
   app.use(compression());
   app.use(cookieParser());
@@ -54,9 +84,11 @@ async function bootstrap() {
   const host = configService.get<string>('HOST');
 
   await app.listen(port, host, () => {
-    Logger.debug(`App is running on ${host}:${port}`);
     Logger.debug(
-      `Swagger JSON available at http://${host}:${port}/swagger.json`,
+      `App is running on ${isDev ? 'https' : 'http'}://${host}:${port}`,
+    );
+    Logger.debug(
+      `Swagger JSON available at ${isDev ? 'https' : 'http'}://${host}:${port}/swagger.json`,
     );
   });
 }

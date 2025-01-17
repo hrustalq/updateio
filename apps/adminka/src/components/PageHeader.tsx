@@ -18,9 +18,49 @@ export default function PageHeader({ className }: { className?: string }) {
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
-              <Link to="/" className="font-medium">
-                Главная
-              </Link>
+              <NavigationMenuTrigger>Система</NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <div className="grid gap-3 p-4 w-[400px]">
+                  <div className="grid grid-cols-1 gap-2">
+                    <Link
+                      to="/"
+                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    >
+                      <div className="text-sm font-medium leading-none">Обновления</div>
+                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        Управление обновлениями игр
+                      </p>
+                    </Link>
+                    <Link
+                      to="/"
+                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    >
+                      <div className="text-sm font-medium leading-none">Мониторинг</div>
+                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        Мониторинг и управление ботами в Telegram и Discord
+                      </p>
+                    </Link>
+                    <Link
+                      to="/settings"
+                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    >
+                      <div className="text-sm font-medium leading-none">Настройки</div>
+                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        Системные настройки и конфигурация
+                      </p>
+                    </Link>
+                    <Link
+                      to="/settings"
+                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    >
+                      <div className="text-sm font-medium leading-none">Логирование</div>
+                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        Логирование и аудит действий пользователей
+                      </p>
+                    </Link>
+                  </div>
+                </div>
+              </NavigationMenuContent>
             </NavigationMenuItem>
 
             <NavigationMenuItem>
@@ -72,34 +112,6 @@ export default function PageHeader({ className }: { className?: string }) {
                       <div className="text-sm font-medium leading-none">Сообщения</div>
                       <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
                         Просмотр и управление сообщениями пользователей
-                      </p>
-                    </Link>
-                  </div>
-                </div>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>Система</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <div className="grid gap-3 p-4 w-[400px]">
-                  <div className="grid grid-cols-1 gap-2">
-                    <Link
-                      to="/updates"
-                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    >
-                      <div className="text-sm font-medium leading-none">Обновления</div>
-                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                        Мониторинг и управление обновлениями игр
-                      </p>
-                    </Link>
-                    <Link
-                      to="/settings"
-                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    >
-                      <div className="text-sm font-medium leading-none">Настройки</div>
-                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                        Системные настройки и конфигурация
                       </p>
                     </Link>
                   </div>
