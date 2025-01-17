@@ -16,6 +16,7 @@ import { swaggerConfig, swaggerOptions } from './swagger/swagger.config';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import { Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const isDev = process.env.NODE_ENV === 'development';
@@ -82,6 +83,21 @@ async function bootstrap() {
   /** Initializing app config using environment variables & nestjs/config */
   const port = parseInt(configService.get<string>('PORT'), 10);
   const host = configService.get<string>('HOST');
+
+  app.connectMicroservice({
+    transport: Transport.KAFKA,
+    options: {
+      client: {
+        clientId: configService.get('app.kafka.clientId'),
+        brokers: configService.get('app.kafka.brokers'),
+      },
+      consumer: {
+        groupId: configService.get('app.kafka.consumerGroupId'),
+      },
+    },
+  });
+
+  await app.startAllMicroservices();
 
   await app.listen(port, host, () => {
     Logger.debug(

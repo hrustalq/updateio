@@ -1,6 +1,8 @@
 import axios from 'axios'
 import type { paths } from './schema'
 import { useAuthStore } from '@repo/auth-store'
+import { parsePrometheusMetrics } from './lib/monitoring/parser'
+import { MetricsResponse } from './lib/monitoring/types'
 
 const getEnvVar = (key: string): string | undefined => {
   // Vite environment
@@ -25,6 +27,15 @@ export const apiClient = axios.create({
   baseURL: `${getEnvVar('VITE_API_URL') || getEnvVar('NEXT_PUBLIC_API_URL') || DEFAULT_API_URL}/v1`,
   withCredentials: true,
 })
+
+export const createClient = (baseURL: string) => {
+  const client = axios.create({
+    baseURL,
+    withCredentials: true,
+  })
+
+  return client
+}
 
 // Add auth header interceptor
 apiClient.interceptors.request.use((config) => {
@@ -200,30 +211,82 @@ export const games = {
 
 // Subscriptions endpoints
 export const subscriptions = {
-  getAll: async (params: paths['/subscriptions']['get']['parameters']['query']) => {
-    const response = await apiClient.get<paths['/subscriptions']['get']['responses']['200']['content']['application/json']>('/subscriptions', { params })
-    return response.data
+  // User subscriptions
+  getUserSubscriptions: async (params?: paths['/subscriptions']['get']['parameters']['query']) => {
+    const response = await apiClient.get<paths['/subscriptions']['get']['responses']['200']['content']['application/json']>('/subscriptions', { params });
+    return response.data;
   },
 
-  getById: async (id: string) => {
-    const response = await apiClient.get<paths['/subscriptions/{id}']['get']['responses']['200']['content']['application/json']>(`/subscriptions/${id}`)
-    return response.data
+  createSubscription: async (data: paths['/subscriptions']['post']['requestBody']['content']['application/json']) => {
+    const response = await apiClient.post<paths['/subscriptions']['post']['responses']['201']['content']['application/json']>('/subscriptions', data);
+    return response.data;
   },
 
-  create: async (data: paths['/subscriptions']['post']['requestBody']['content']['application/json']) => {
-    const response = await apiClient.post<paths['/subscriptions']['post']['responses']['201']['content']['application/json']>('/subscriptions', data)
-    return response.data
+  deleteSubscription: async (id: string) => {
+    const response = await apiClient.delete<paths['/subscriptions/{id}']['delete']['responses']['200']['content']['application/json']>(`/subscriptions/${id}`);
+    return response.data;
   },
 
-  update: async (id: string, data: paths['/subscriptions/{id}']['patch']['requestBody']['content']['application/json']) => {
-    const response = await apiClient.patch<paths['/subscriptions/{id}']['patch']['responses']['200']['content']['application/json']>(`/subscriptions/${id}`, data)
-    return response.data
+  // Admin endpoints
+  adminGetUserSubscriptions: async (
+    userId: string,
+    params?: paths['/subscriptions/admin/users/{userId}']['get']['parameters']['query'],
+  ) => {
+    const response = await apiClient.get<paths['/subscriptions/admin/users/{userId}']['get']['responses']['200']['content']['application/json']>(
+      `/subscriptions/admin/users/${userId}`,
+      { params },
+    );
+    return response.data;
   },
 
-  delete: async (id: string) => {
-    await apiClient.delete(`/subscriptions/${id}`)
+  adminCreateSubscription: async (
+    userId: string,
+    data: paths['/subscriptions/admin/users/{userId}']['post']['requestBody']['content']['application/json'],
+  ) => {
+    const response = await apiClient.post<paths['/subscriptions/admin/users/{userId}']['post']['responses']['201']['content']['application/json']>(
+      `/subscriptions/admin/users/${userId}`,
+      data,
+    );
+    return response.data;
   },
-}
+
+  adminDeleteSubscription: async (id: string) => {
+    const response = await apiClient.delete<paths['/subscriptions/admin/{id}']['delete']['responses']['200']['content']['application/json']>(
+      `/subscriptions/admin/${id}`,
+    );
+    return response.data;
+  },
+
+  // Group subscriptions
+  getGroupSubscriptions: async (
+    groupId: string,
+    params?: paths['/subscriptions/groups/{groupId}']['get']['parameters']['query'],
+  ) => {
+    const response = await apiClient.get<paths['/subscriptions/groups/{groupId}']['get']['responses']['200']['content']['application/json']>(
+      `/subscriptions/groups/${groupId}`,
+      { params },
+    );
+    return response.data;
+  },
+
+  createGroupSubscription: async (
+    groupId: string,
+    data: paths['/subscriptions/groups/{groupId}']['post']['requestBody']['content']['application/json'],
+  ) => {
+    const response = await apiClient.post<paths['/subscriptions/groups/{groupId}']['post']['responses']['201']['content']['application/json']>(
+      `/subscriptions/groups/${groupId}`,
+      data,
+    );
+    return response.data;
+  },
+
+  deleteGroupSubscription: async (groupId: string, id: string) => {
+    const response = await apiClient.delete<paths['/subscriptions/groups/{groupId}/subscriptions/{id}']['delete']['responses']['200']['content']['application/json']>(
+      `/subscriptions/groups/${groupId}/subscriptions/${id}`,
+    );
+    return response.data;
+  },
+};
 
 // Notifications endpoints
 export const notifications = {
@@ -333,3 +396,17 @@ export const updates = {
   },
 }
 
+export const monitoring = {
+  getMetrics: async (): Promise<MetricsResponse> => {
+    const response = await apiClient.get<{ data: string }>('/metrics', {
+      headers: {
+        Accept: 'text/plain',
+      },
+    });
+    return parsePrometheusMetrics(response.data.data, {
+      timestamp: new Date().toISOString(),
+      path: `${apiClient.defaults.baseURL}/metrics`,
+      version: '1',
+    })
+  },
+}

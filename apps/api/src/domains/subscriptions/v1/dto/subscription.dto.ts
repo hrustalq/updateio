@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { GameDto } from '../../../games/v1/dto/game.dto';
 
 export class SubscriptionDto {
   @ApiProperty({
@@ -8,16 +9,16 @@ export class SubscriptionDto {
   id: string;
 
   @ApiProperty({
-    description: 'ID of the user who subscribed',
+    description: 'The user ID who owns the subscription',
     example: 'clrk2345600000123jk5679',
   })
   userId: string;
 
   @ApiProperty({
-    description: 'ID of the game subscribed to',
-    example: 'clrk2345600000123jk5680',
+    description: 'The game associated with the subscription',
+    type: GameDto,
   })
-  gameId: string;
+  game: GameDto;
 
   @ApiProperty({
     description: 'Creation timestamp',

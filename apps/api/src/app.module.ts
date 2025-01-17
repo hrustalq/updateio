@@ -29,6 +29,10 @@ import { SubscriptionsModule } from './domains/subscriptions/subscriptions.modul
 import { NotificationsModule } from './domains/notifications/notifications.module';
 import { ReportsModule } from './domains/reports/reports.module';
 import { UpdateCommandsModule } from './domains/update-commands/update-commands.module';
+import { MonitoringModule } from './infrastructure/monitoring/prometheus.module';
+import { MetricsMiddleware } from './infrastructure/monitoring/metrics.middleware';
+import { GameUpdatesModule } from './domains/game-updates/game-updates.module';
+import { KafkaModule } from './infrastructure/kafka/kafka.module';
 
 @Module({
   imports: [
@@ -49,6 +53,9 @@ import { UpdateCommandsModule } from './domains/update-commands/update-commands.
     NotificationsModule,
     ReportsModule,
     UpdateCommandsModule,
+    GameUpdatesModule,
+    MonitoringModule,
+    KafkaModule,
   ],
   providers: [
     {
@@ -80,6 +87,8 @@ import { UpdateCommandsModule } from './domains/update-commands/update-commands.
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware, helmet()).forRoutes('*');
+    consumer
+      .apply(LoggerMiddleware, helmet(), MetricsMiddleware)
+      .forRoutes('*');
   }
 }

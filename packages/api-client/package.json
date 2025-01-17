@@ -10,16 +10,17 @@
   ],
   "scripts": {
     "build": "tsup",
-    "lint": "eslint src/",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "type-check": "tsc --noEmit",
     "generate-types": "NODE_TLS_REJECT_UNAUTHORIZED=0 openapi-typescript https://localhost:3000/swagger.json --output ./src/schema.ts"
   },
   "dependencies": {
-    "@repo/shared": "workspace:*",
     "@repo/auth-store": "workspace:*",
+    "@repo/shared": "workspace:*",
     "@tanstack/react-query": "^5.17.9",
+    "@tanstack/react-router": "^1.15.22",
     "axios": "^1.6.5",
+    "react": "18",
     "swr": "^2.2.4",
     "zod": "^3.22.4",
     "zod-to-json-schema": "^3.22.3",

@@ -61,6 +61,18 @@ export interface paths {
     /** Update a user */
     patch: operations["UsersV1Controller_update"];
   };
+  "/users/admin": {
+    /** Get all users (Admin) */
+    get: operations["UsersV1Controller_findAllAdmin"];
+  };
+  "/users/admin/{id}": {
+    /** Get user by ID (Admin) */
+    get: operations["UsersV1Controller_findOneAdmin"];
+    /** Delete user (Admin) */
+    delete: operations["UsersV1Controller_removeAdmin"];
+    /** Update user (Admin) */
+    patch: operations["UsersV1Controller_updateAdmin"];
+  };
   "/games": {
     /** Get all games */
     get: operations["GamesV1Controller_findAll"];
@@ -90,18 +102,34 @@ export interface paths {
     patch: operations["UpdatesV1Controller_update"];
   };
   "/subscriptions": {
-    /** Get all subscriptions */
-    get: operations["SubscriptionsV1Controller_findAll"];
-    /** Create a new subscription */
+    /** Get current user subscriptions */
+    get: operations["SubscriptionsV1Controller_findUserSubscriptions"];
+    /** Create new subscriptions for current user */
     post: operations["SubscriptionsV1Controller_create"];
   };
+  "/subscriptions/admin/users/{userId}": {
+    /** Get user subscriptions (Admin) */
+    get: operations["SubscriptionsV1Controller_findUserSubscriptionsAdmin"];
+    /** Create user subscriptions (Admin) */
+    post: operations["SubscriptionsV1Controller_createUserSubscriptionsAdmin"];
+  };
+  "/subscriptions/admin/{id}": {
+    /** Delete any subscription (admin only) */
+    delete: operations["SubscriptionsV1Controller_removeAdmin"];
+  };
   "/subscriptions/{id}": {
-    /** Get a subscription by id */
-    get: operations["SubscriptionsV1Controller_findOne"];
-    /** Delete a subscription */
+    /** Delete subscription */
     delete: operations["SubscriptionsV1Controller_remove"];
-    /** Update a subscription */
-    patch: operations["SubscriptionsV1Controller_update"];
+  };
+  "/subscriptions/groups/{groupId}": {
+    /** Get group subscriptions */
+    get: operations["SubscriptionsV1Controller_findGroupSubscriptions"];
+    /** Create new subscriptions for a group */
+    post: operations["SubscriptionsV1Controller_createGroupSubscription"];
+  };
+  "/subscriptions/groups/{groupId}/subscriptions/{id}": {
+    /** Delete group subscription */
+    delete: operations["SubscriptionsV1Controller_removeGroupSubscription"];
   };
   "/notifications": {
     /** Get all notifications */
@@ -144,6 +172,9 @@ export interface paths {
     delete: operations["UpdateCommandsV1Controller_remove"];
     /** Update an update command */
     patch: operations["UpdateCommandsV1Controller_update"];
+  };
+  "/metrics": {
+    get: operations["PrometheusController_index"];
   };
 }
 
@@ -513,15 +544,12 @@ export interface components {
        */
       id: string;
       /**
-       * @description ID of the user who subscribed
+       * @description The user ID who owns the subscription
        * @example clrk2345600000123jk5679
        */
       userId: string;
-      /**
-       * @description ID of the game subscribed to
-       * @example clrk2345600000123jk5680
-       */
-      gameId: string;
+      /** @description The game associated with the subscription */
+      game: components["schemas"]["GameDto"];
       /**
        * Format: date-time
        * @description Creation timestamp
@@ -535,27 +563,51 @@ export interface components {
     };
     CreateSubscriptionDto: {
       /**
-       * @description ID of the user who subscribes
-       * @example clrk2345600000123jk5679
+       * @description Array of game IDs to subscribe to
+       * @example [
+       *   "clrk2345600000123jk5678"
+       * ]
        */
-      userId: string;
+      gameIds: string[];
       /**
-       * @description ID of the game to subscribe to
-       * @example clrk2345600000123jk5680
+       * @description Enable notifications for this subscription
+       * @default true
+       * @example true
        */
-      gameId: string;
+      notificationsEnabled?: boolean;
     };
-    UpdateSubscriptionDto: {
+    GroupSubscriptionDto: {
       /**
-       * @description ID of the user who subscribes
+       * @description The unique identifier of the subscription
+       * @example clrk2345600000123jk5678
+       */
+      id: string;
+      /**
+       * @description The group ID that owns the subscription
        * @example clrk2345600000123jk5679
        */
-      userId?: string;
+      groupId: string;
+      /** @description The game associated with the subscription */
+      game: components["schemas"]["GameDto"];
       /**
-       * @description ID of the game to subscribe to
-       * @example clrk2345600000123jk5680
+       * Format: date-time
+       * @description Creation timestamp
        */
-      gameId?: string;
+      createdAt: string;
+      /**
+       * Format: date-time
+       * @description Last update timestamp
+       */
+      updatedAt: string;
+    };
+    CreateGroupSubscriptionDto: {
+      /**
+       * @description Array of game IDs to subscribe to
+       * @example [
+       *   "clrk2345600000123jk5678"
+       * ]
+       */
+      gameIds: string[];
     };
     NotificationDto: {
       /**
@@ -765,7 +817,7 @@ export interface operations {
         page?: number;
         /** @description Number of items per page */
         limit?: number;
-        /** @description Sorting criteria (format: field:order,field2:order2) */
+        /** @description Sorting criteria in array format */
         sort?: string[];
       };
     };
@@ -778,7 +830,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.664Z
+               * @example 2025-01-17T20:35:55.003Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -904,7 +956,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.664Z
+               * @example 2025-01-17T20:35:55.003Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -998,7 +1050,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.664Z
+               * @example 2025-01-17T20:35:55.003Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -1092,7 +1144,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.665Z
+               * @example 2025-01-17T20:35:55.004Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -1191,7 +1243,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.664Z
+               * @example 2025-01-17T20:35:55.003Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -1280,7 +1332,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.502Z
+               * @example 2025-01-17T20:35:54.840Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/me */
@@ -1369,7 +1421,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.503Z
+               * @example 2025-01-17T20:35:54.841Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/token/refresh */
@@ -1463,7 +1515,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.503Z
+               * @example 2025-01-17T20:35:54.841Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/login */
@@ -1557,7 +1609,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.503Z
+               * @example 2025-01-17T20:35:54.841Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/telegram/login */
@@ -1651,7 +1703,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.503Z
+               * @example 2025-01-17T20:35:54.841Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/logout */
@@ -1745,7 +1797,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.504Z
+               * @example 2025-01-17T20:35:54.841Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/verify */
@@ -1834,7 +1886,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.521Z
+               * @example 2025-01-17T20:35:54.870Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -1960,7 +2012,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.521Z
+               * @example 2025-01-17T20:35:54.869Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2054,7 +2106,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.521Z
+               * @example 2025-01-17T20:35:54.870Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2148,7 +2200,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.521Z
+               * @example 2025-01-17T20:35:54.870Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2242,7 +2294,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.521Z
+               * @example 2025-01-17T20:35:54.870Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2341,7 +2393,425 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.521Z
+               * @example 2025-01-17T20:35:54.870Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get all users (Admin) */
+  UsersV1Controller_findAllAdmin: {
+    parameters: {
+      query?: {
+        /** @description Page number (starts from 1) */
+        page?: number;
+        /** @description Number of items per page */
+        limit?: number;
+        /** @description Sorting criteria in array format */
+        sort?: string[];
+      };
+    };
+    responses: {
+      /** @description Successful response with metadata */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UserDto"][];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-17T20:35:54.870Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+              pagination?: {
+                /**
+                 * @description Total number of items
+                 * @example 100
+                 */
+                total?: number;
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description Items per page
+                 * @example 10
+                 */
+                limit?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 10
+                 */
+                totalPages?: number;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPreviousPage?: boolean;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNextPage?: boolean;
+              };
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Get user by ID (Admin) */
+  UsersV1Controller_findOneAdmin: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response with metadata */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UserDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-17T20:35:54.870Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Delete user (Admin) */
+  UsersV1Controller_removeAdmin: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response with metadata */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UserDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-17T20:35:54.870Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Update user (Admin) */
+  UsersV1Controller_updateAdmin: {
+    parameters: {
+      path: {
+        id: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateUserDto"];
+      };
+    };
+    responses: {
+      /** @description Successful response with metadata */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["UserDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-17T20:35:54.870Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2427,7 +2897,7 @@ export interface operations {
         page?: number;
         /** @description Number of items per page */
         limit?: number;
-        /** @description Sorting criteria (format: field:order,field2:order2) */
+        /** @description Sorting criteria in array format */
         sort?: string[];
       };
     };
@@ -2440,7 +2910,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.702Z
+               * @example 2025-01-17T20:35:55.039Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2566,7 +3036,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.702Z
+               * @example 2025-01-17T20:35:55.039Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2660,7 +3130,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.702Z
+               * @example 2025-01-17T20:35:55.039Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2754,7 +3224,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.703Z
+               * @example 2025-01-17T20:35:55.039Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2853,7 +3323,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.703Z
+               * @example 2025-01-17T20:35:55.039Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -2939,7 +3409,7 @@ export interface operations {
         page?: number;
         /** @description Number of items per page */
         limit?: number;
-        /** @description Sorting criteria (format: field:order,field2:order2) */
+        /** @description Sorting criteria in array format */
         sort?: string[];
         /** @description Filter updates by game ID */
         gameId?: string;
@@ -2954,7 +3424,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.728Z
+               * @example 2025-01-17T20:35:55.064Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3080,7 +3550,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.727Z
+               * @example 2025-01-17T20:35:55.064Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3174,7 +3644,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.728Z
+               * @example 2025-01-17T20:35:55.064Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3268,7 +3738,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.728Z
+               * @example 2025-01-17T20:35:55.064Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3367,7 +3837,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.728Z
+               * @example 2025-01-17T20:35:55.064Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3445,16 +3915,20 @@ export interface operations {
       };
     };
   };
-  /** Get all subscriptions */
-  SubscriptionsV1Controller_findAll: {
+  /** Get current user subscriptions */
+  SubscriptionsV1Controller_findUserSubscriptions: {
     parameters: {
-      query: {
-        userId: string;
-        gameId: string;
+      query?: {
+        /** @description Page number (starts from 1) */
+        page?: number;
+        /** @description Number of items per page */
+        limit?: number;
+        /** @description Sorting criteria in array format */
+        sort?: string[];
       };
     };
     responses: {
-      /** @description Returns all subscriptions */
+      /** @description Successful response with metadata */
       200: {
         content: {
           "application/json": {
@@ -3462,7 +3936,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.749Z
+               * @example 2025-01-17T20:35:55.122Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3572,7 +4046,7 @@ export interface operations {
       };
     };
   };
-  /** Create a new subscription */
+  /** Create new subscriptions for current user */
   SubscriptionsV1Controller_create: {
     requestBody: {
       content: {
@@ -3584,17 +4058,49 @@ export interface operations {
       201: {
         content: {
           "application/json": {
-            data?: components["schemas"]["SubscriptionDto"];
+            data?: components["schemas"]["SubscriptionDto"][];
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.749Z
+               * @example 2025-01-17T20:35:55.122Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
               path?: string;
               /** @example 1 */
               version?: string;
+              pagination?: {
+                /**
+                 * @description Total number of items
+                 * @example 100
+                 */
+                total?: number;
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description Items per page
+                 * @example 10
+                 */
+                limit?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 10
+                 */
+                totalPages?: number;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPreviousPage?: boolean;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNextPage?: boolean;
+              };
             };
           };
         };
@@ -3666,15 +4172,280 @@ export interface operations {
       };
     };
   };
-  /** Get a subscription by id */
-  SubscriptionsV1Controller_findOne: {
+  /** Get user subscriptions (Admin) */
+  SubscriptionsV1Controller_findUserSubscriptionsAdmin: {
+    parameters: {
+      query?: {
+        /** @description Page number (starts from 1) */
+        page?: number;
+        /** @description Number of items per page */
+        limit?: number;
+        /** @description Sorting criteria in array format */
+        sort?: string[];
+      };
+      path: {
+        userId: string;
+      };
+    };
+    responses: {
+      /** @description Successful response with metadata */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["SubscriptionDto"][];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-17T20:35:55.122Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+              pagination?: {
+                /**
+                 * @description Total number of items
+                 * @example 100
+                 */
+                total?: number;
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description Items per page
+                 * @example 10
+                 */
+                limit?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 10
+                 */
+                totalPages?: number;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPreviousPage?: boolean;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNextPage?: boolean;
+              };
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Create user subscriptions (Admin) */
+  SubscriptionsV1Controller_createUserSubscriptionsAdmin: {
+    parameters: {
+      path: {
+        userId: string;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateSubscriptionDto"];
+      };
+    };
+    responses: {
+      /** @description Successful response with metadata */
+      201: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["SubscriptionDto"][];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-17T20:35:55.122Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+              pagination?: {
+                /**
+                 * @description Total number of items
+                 * @example 100
+                 */
+                total?: number;
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description Items per page
+                 * @example 10
+                 */
+                limit?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 10
+                 */
+                totalPages?: number;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPreviousPage?: boolean;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNextPage?: boolean;
+              };
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Delete any subscription (admin only) */
+  SubscriptionsV1Controller_removeAdmin: {
     parameters: {
       path: {
         id: string;
       };
     };
     responses: {
-      /** @description Returns the subscription */
+      /** @description Successful response with metadata */
       200: {
         content: {
           "application/json": {
@@ -3682,7 +4453,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.749Z
+               * @example 2025-01-17T20:35:55.122Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3760,7 +4531,7 @@ export interface operations {
       };
     };
   };
-  /** Delete a subscription */
+  /** Delete subscription */
   SubscriptionsV1Controller_remove: {
     parameters: {
       path: {
@@ -3768,7 +4539,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description The subscription has been successfully deleted. */
+      /** @description Successful response with metadata */
       200: {
         content: {
           "application/json": {
@@ -3776,7 +4547,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.750Z
+               * @example 2025-01-17T20:35:55.122Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3854,28 +4625,289 @@ export interface operations {
       };
     };
   };
-  /** Update a subscription */
-  SubscriptionsV1Controller_update: {
+  /** Get group subscriptions */
+  SubscriptionsV1Controller_findGroupSubscriptions: {
+    parameters: {
+      query?: {
+        /** @description Page number (starts from 1) */
+        page?: number;
+        /** @description Number of items per page */
+        limit?: number;
+        /** @description Sorting criteria in array format */
+        sort?: string[];
+      };
+      path: {
+        groupId: string;
+      };
+    };
+    responses: {
+      /** @description Successful response with metadata */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["GroupSubscriptionDto"][];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-17T20:35:55.122Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+              pagination?: {
+                /**
+                 * @description Total number of items
+                 * @example 100
+                 */
+                total?: number;
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description Items per page
+                 * @example 10
+                 */
+                limit?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 10
+                 */
+                totalPages?: number;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPreviousPage?: boolean;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNextPage?: boolean;
+              };
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Create new subscriptions for a group */
+  SubscriptionsV1Controller_createGroupSubscription: {
     parameters: {
       path: {
-        id: string;
+        groupId: string;
       };
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["UpdateSubscriptionDto"];
+        "application/json": components["schemas"]["CreateGroupSubscriptionDto"];
       };
     };
     responses: {
-      /** @description The subscription has been successfully updated. */
-      200: {
+      /** @description Successful response with metadata */
+      201: {
         content: {
           "application/json": {
-            data?: components["schemas"]["SubscriptionDto"];
+            data?: components["schemas"]["GroupSubscriptionDto"][];
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.750Z
+               * @example 2025-01-17T20:35:55.122Z
+               */
+              timestamp?: string;
+              /** @example http://localhost:3000/api/v1/ */
+              path?: string;
+              /** @example 1 */
+              version?: string;
+              pagination?: {
+                /**
+                 * @description Total number of items
+                 * @example 100
+                 */
+                total?: number;
+                /**
+                 * @description Current page number
+                 * @example 1
+                 */
+                page?: number;
+                /**
+                 * @description Items per page
+                 * @example 10
+                 */
+                limit?: number;
+                /**
+                 * @description Total number of pages
+                 * @example 10
+                 */
+                totalPages?: number;
+                /**
+                 * @description Whether there is a previous page
+                 * @example false
+                 */
+                hasPreviousPage?: boolean;
+                /**
+                 * @description Whether there is a next page
+                 * @example true
+                 */
+                hasNextPage?: boolean;
+              };
+            };
+          };
+        };
+      };
+      /** @description Bad Request - Validation failed */
+      400: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Unauthorized - Authentication failed */
+      401: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Forbidden - Insufficient permissions */
+      403: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Not Found - Resource not found */
+      404: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        content: {
+          "application/json": {
+            statusCode?: number;
+            message?: string | string[];
+            error?: string;
+            /** Format: date-time */
+            timestamp?: string;
+            path?: string;
+          };
+        };
+      };
+    };
+  };
+  /** Delete group subscription */
+  SubscriptionsV1Controller_removeGroupSubscription: {
+    parameters: {
+      path: {
+        groupId: string;
+        id: string;
+      };
+    };
+    responses: {
+      /** @description Successful response with metadata */
+      200: {
+        content: {
+          "application/json": {
+            data?: components["schemas"]["GroupSubscriptionDto"];
+            metadata?: {
+              /**
+               * Format: date-time
+               * @example 2025-01-17T20:35:55.122Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -3970,7 +5002,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.772Z
+               * @example 2025-01-17T20:35:55.144Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4096,7 +5128,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.772Z
+               * @example 2025-01-17T20:35:55.143Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4190,7 +5222,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.772Z
+               * @example 2025-01-17T20:35:55.144Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4284,7 +5316,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.772Z
+               * @example 2025-01-17T20:35:55.144Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4383,7 +5415,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.772Z
+               * @example 2025-01-17T20:35:55.144Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4477,7 +5509,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.793Z
+               * @example 2025-01-17T20:35:55.160Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4603,7 +5635,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.793Z
+               * @example 2025-01-17T20:35:55.160Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4697,7 +5729,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.793Z
+               * @example 2025-01-17T20:35:55.160Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4791,7 +5823,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.793Z
+               * @example 2025-01-17T20:35:55.160Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4890,7 +5922,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.793Z
+               * @example 2025-01-17T20:35:55.160Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -4984,7 +6016,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.813Z
+               * @example 2025-01-17T20:35:55.178Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -5110,7 +6142,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.812Z
+               * @example 2025-01-17T20:35:55.178Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -5204,7 +6236,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.813Z
+               * @example 2025-01-17T20:35:55.178Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -5298,7 +6330,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.813Z
+               * @example 2025-01-17T20:35:55.178Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -5397,7 +6429,7 @@ export interface operations {
             metadata?: {
               /**
                * Format: date-time
-               * @example 2025-01-17T13:25:41.813Z
+               * @example 2025-01-17T20:35:55.178Z
                */
               timestamp?: string;
               /** @example http://localhost:3000/api/v1/ */
@@ -5472,6 +6504,13 @@ export interface operations {
             path?: string;
           };
         };
+      };
+    };
+  };
+  PrometheusController_index: {
+    responses: {
+      200: {
+        content: never;
       };
     };
   };

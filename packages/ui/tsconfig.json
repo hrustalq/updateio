@@ -1,13 +1,10 @@
 {
-  "extends": "@repo/typescript-config/react-library.json",
+  "extends": "./tsconfig.build.json",
   "compilerOptions": {
-    //"outDir": "dist"
-    "module": "NodeNext",
-    "baseUrl": ".",
-    "paths": {
-      "@repo/ui/*": ["./src/*"]
-    }
+    "composite": true,
+    "incremental": true,
+    "types": ["node"]
   },
-  "include": ["."],
+  "include": ["src", "tsup.config.ts"],
   "exclude": ["node_modules", "dist"]
 }

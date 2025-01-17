@@ -32,6 +32,15 @@ export default function PageHeader({ className }: { className?: string }) {
                       </p>
                     </Link>
                     <Link
+                      to="/metrics"
+                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    >
+                      <div className="text-sm font-medium leading-none">Метрики</div>
+                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        Мониторинг производительности и использования системы
+                      </p>
+                    </Link>
+                    <Link
                       to="/"
                       className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                     >

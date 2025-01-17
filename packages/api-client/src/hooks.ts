@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { auth, gameProviders, games, notifications, updateCommands, updates } from './client'
+import { auth, gameProviders, games, monitoring, notifications, updateCommands, updates, subscriptions } from './client'
 import useSWR from 'swr'
 
 // Auth hooks
@@ -154,3 +154,72 @@ export const useDeleteUpdate = () => {
     mutationFn: updates.delete,
   })
 } 
+
+export const useMetrics = () => {
+  return useQuery({
+    queryKey: ['metrics'],
+    queryFn: monitoring.getMetrics,
+  })
+}
+
+// User subscription hooks
+export const useUserSubscriptions = (params?: Parameters<typeof subscriptions.getUserSubscriptions>[0]) => {
+  return useQuery({
+    queryKey: ['subscriptions', params],
+    queryFn: () => subscriptions.getUserSubscriptions(params),
+  });
+};
+
+export const useCreateSubscription = () => {
+  return useMutation({
+    mutationFn: subscriptions.createSubscription,
+  });
+};
+
+export const useDeleteSubscription = () => {
+  return useMutation({
+    mutationFn: subscriptions.deleteSubscription,
+  });
+};
+
+// Admin subscription hooks
+export const useAdminUserSubscriptions = (
+  userId: string,
+  params?: Parameters<typeof subscriptions.adminGetUserSubscriptions>[1],
+) => {
+  return useQuery({
+    queryKey: ['admin', 'subscriptions', userId, params],
+    queryFn: () => subscriptions.adminGetUserSubscriptions(userId, params),
+  });
+};
+
+export const useAdminDeleteSubscription = () => {
+  return useMutation({
+    mutationFn: subscriptions.adminDeleteSubscription,
+  });
+};
+
+// Group subscription hooks
+export const useGroupSubscriptions = (
+  groupId: string,
+  params?: Parameters<typeof subscriptions.getGroupSubscriptions>[1],
+) => {
+  return useQuery({
+    queryKey: ['group-subscriptions', groupId, params],
+    queryFn: () => subscriptions.getGroupSubscriptions(groupId, params),
+  });
+};
+
+export const useCreateGroupSubscription = () => {
+  return useMutation({
+    mutationFn: ({ groupId, ...data }: Parameters<typeof subscriptions.createGroupSubscription>[1] & { groupId: string }) =>
+      subscriptions.createGroupSubscription(groupId, data),
+  });
+};
+
+export const useDeleteGroupSubscription = () => {
+  return useMutation({
+    mutationFn: ({ groupId, id }: { groupId: string; id: string }) =>
+      subscriptions.deleteGroupSubscription(groupId, id),
+  });
+};

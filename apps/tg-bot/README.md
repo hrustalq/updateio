@@ -1,73 +1,126 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# UpdateIO Telegram Бот
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Telegram бот для доставки уведомлений об обновлениях игр пользователям и управления их подписками.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Возможности
 
-## Description
+- 🔔 Уведомления об обновлениях игр в реальном времени
+- 📝 Управление подписками пользователей
+- 🎮 Настройка предпочтений для конкретных игр
+- 📊 Отслеживание статуса доставки уведомлений
+- 🔐 Аутентификация и авторизация пользователей
+- 🔄 Интеграция с UpdateIO API
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Требования
 
-## Installation
+- Node.js 18+
+- pnpm 8+
+- Redis 7+
+- Telegram Bot Token (получить у [@BotFather](https://t.me/BotFather))
+
+## Переменные окружения
+
+Создайте файл `.env` на основе `.env.example`:
 
 ```bash
-$ npm install
+# APP
+NODE_ENV=development
+HOST=localhost
+PORT=3003
+
+# REDIS
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_TTL=4h
+REDIS_PASSWORD=redis
+
+# AUTH
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 ```
 
-## Running the app
+## Установка
+
+1. Установите зависимости:
+```bash
+pnpm install
+```
+
+2. Настройте переменные окружения:
+```bash
+cp .env.example .env
+# Отредактируйте .env файл
+```
+
+3. Соберите проект:
+```bash
+pnpm build
+```
+
+4. Запустите бота:
+```bash
+pnpm start
+```
+
+Для разработки:
+```bash
+pnpm dev
+```
+
+## Архитектура
+
+Бот построен с использованием:
+- [Telegraf](https://github.com/telegraf/telegraf) - Современный фреймворк для Telegram ботов
+- TypeScript - Для типизации и улучшения разработки
+- Zod - Для валидации типов во время выполнения
+- Redis - Для кэширования и управления сессиями
+
+## Команды
+
+- `/start` - Инициализация бота и регистрация пользователя
+- `/subscribe <игра>` - Подписаться на обновления игры
+- `/unsubscribe <игра>` - Отписаться от обновлений игры
+- `/list` - Список активных подписок
+- `/settings` - Управление настройками уведомлений
+- `/help` - Показать доступные команды
+
+## Разработка
+
+### Структура проекта
+
+```
+src/
+├── commands/        # Реализация команд бота
+├── handlers/        # Обработчики сообщений и событий
+├── services/        # Бизнес-логика и внешние сервисы
+├── types/          # TypeScript типы и интерфейсы
+├── utils/          # Вспомогательные функции
+└── config/         # Управление конфигурацией
+```
+
+### Добавление новых команд
+
+1. Создайте файл команды в `src/commands/`
+2. Зарегистрируйте команду при инициализации бота
+3. Добавьте документацию к команде
+4. Протестируйте реализацию
+
+## Тестирование
 
 ```bash
-# development
-$ npm run start
+# Запуск тестов
+pnpm test
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+# Запуск тестов в режиме наблюдения
+pnpm test:watch
 ```
 
-## Test
+## Участие в разработке
 
-```bash
-# unit tests
-$ npm run test
+1. Создайте ветку для новой функциональности
+2. Внесите изменения
+3. Добавьте тесты
+4. Создайте Pull Request
 
-# e2e tests
-$ npm run test:e2e
+## Лицензия
 
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+MIT

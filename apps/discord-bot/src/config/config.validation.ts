@@ -48,6 +48,14 @@ class EnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   DISCORD_BOT_TOKEN: string;
+
+  @IsString()
+  @IsNotEmpty()
+  KAFKA_BROKERS: string;
+
+  @IsString()
+  @IsOptional()
+  KAFKA_CLIENT_ID: string = 'discord-bot';
 }
 
 export function validate(config: Record<string, unknown>) {

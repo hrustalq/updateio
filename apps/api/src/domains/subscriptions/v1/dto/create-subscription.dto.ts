@@ -1,20 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsString, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateSubscriptionDto {
   @ApiProperty({
-    description: 'ID of the user who subscribes',
-    example: 'clrk2345600000123jk5679',
+    description: 'Array of game IDs to subscribe to',
+    example: ['clrk2345600000123jk5678'],
+    type: [String],
   })
-  @IsString()
-  @IsNotEmpty()
-  userId: string;
+  @IsArray()
+  @IsString({ each: true })
+  gameIds: string[];
 
   @ApiProperty({
-    description: 'ID of the game to subscribe to',
-    example: 'clrk2345600000123jk5680',
+    description: 'Enable notifications for this subscription',
+    example: true,
+    required: false,
+    default: true,
   })
-  @IsString()
-  @IsNotEmpty()
-  gameId: string;
+  @IsBoolean()
+  @IsOptional()
+  notificationsEnabled?: boolean;
 }

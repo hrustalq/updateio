@@ -4,4 +4,10 @@ export default registerAs('app', () => ({
   nodeEnv: process.env.NODE_ENV || 'development',
   host: process.env.HOST || '',
   port: process.env.PORT || 3000,
+  kafka: {
+    brokers: process.env.KAFKA_BROKERS?.split(',') || ['localhost:9092'],
+    clientId: process.env.KAFKA_CLIENT_ID || 'api',
+    consumerGroupId:
+      process.env.KAFKA_CONSUMER_GROUP_ID || 'api-consumer-group',
+  },
 }));

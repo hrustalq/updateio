@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "lint": "eslint . --max-warnings 0",
     "clean": "rm -rf dist && rm -rf .turbo"
   },

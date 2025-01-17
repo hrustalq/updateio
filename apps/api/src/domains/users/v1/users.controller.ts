@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UsersV1Service } from './users.service';
@@ -13,6 +14,13 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 import { ApiResponse } from '../../../common/decorators/api-response.decorator';
+import { Auth } from '../../../common/decorators/auth.decorator';
+import { Roles } from '../../../common/decorators/roles.decorator';
+import { UserRole } from '@repo/database';
+import { Cache } from '../../../common/decorators/cache.decorator';
+import { PaginationQueryDto } from '../../../common/dto/pagination-query.dto';
+import { SortingQueryDto } from '../../../common/dto/sorting-query.dto';
+import { AuthType } from '../../../common/decorators/auth.decorator';
 
 @ApiTags('Users')
 @Controller({ path: 'users', version: '1' })
@@ -80,5 +88,46 @@ export class UsersV1Controller {
   })
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
+  }
+
+  @Get('admin')
+  @Auth({ type: AuthType.Bearer })
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get all users (Admin)' })
+  @ApiResponse({ type: UserDto, isArray: true })
+  @Cache({ namespace: 'admin-users' })
+  findAllAdmin(
+    @Query() paginationQuery: PaginationQueryDto,
+    @Query() sortingQuery: SortingQueryDto<UserDto>,
+  ) {
+    return this.usersService.findAllAdmin(paginationQuery, sortingQuery);
+  }
+
+  @Get('admin/:id')
+  @Auth({ type: AuthType.Bearer })
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get user by ID (Admin)' })
+  @ApiResponse({ type: UserDto })
+  @Cache({ namespace: 'admin-user', key: (req) => req.params.id })
+  findOneAdmin(@Param('id') id: string) {
+    return this.usersService.findOneAdmin(id);
+  }
+
+  @Patch('admin/:id')
+  @Auth({ type: AuthType.Bearer })
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Update user (Admin)' })
+  @ApiResponse({ type: UserDto })
+  updateAdmin(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateAdmin(id, updateUserDto);
+  }
+
+  @Delete('admin/:id')
+  @Auth({ type: AuthType.Bearer })
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Delete user (Admin)' })
+  @ApiResponse({ type: UserDto })
+  removeAdmin(@Param('id') id: string) {
+    return this.usersService.removeAdmin(id);
   }
 }

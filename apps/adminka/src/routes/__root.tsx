@@ -1,15 +1,14 @@
 import React from 'react'
 import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
-
 import PageHeader from '../components/PageHeader'
 
 export const Route = createRootRoute({
   component: RootComponent,
+  validateSearch: (search: Record<string, unknown>) => search,
 })
 
 function RootComponent() {
-  // Show full layout when authenticated
   return (
     <div className="flex flex-col min-h-screen">
       <PageHeader />
@@ -18,5 +17,5 @@ function RootComponent() {
       </main>
       <TanStackRouterDevtools />
     </div>
-  )
+  );
 }

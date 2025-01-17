@@ -11,13 +11,10 @@ model GameProvider {
   id          String   @id @default(cuid())
   name        String
   description String?
-
-  imageUrl String?
-
-  games Game[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  imageUrl    String?
+  games       Game[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Game {
@@ -25,18 +22,20 @@ model Game {
 
   name        String
   description String?
+  aliases     String[]
+  
   imageUrl    String?
+  externalId  String?
 
-  externalId String?
-
-  providerId String
-  provider GameProvider @relation(fields: [providerId], references: [id])
+  providerId  String
+  provider    GameProvider @relation(fields: [providerId], references: [id])
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  updates GameUpdate[]
+  updates       GameUpdate[]
   subscriptions UserSubscription[]
+  groupSubscriptions GroupSubscription[]
   updateCommand UpdateCommand?
 
   @@index([providerId])
@@ -46,12 +45,9 @@ model GameUpdate {
   id        String   @id @default(cuid())
   version   String?
   content   String?
-
   gameId    String
-  game Game @relation(fields: [gameId], references: [id])
-
+  game      Game     @relation(fields: [gameId], references: [id])
   notifications Notification[]
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -67,36 +63,92 @@ enum UserRole {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  telegramId   String?  @unique
-  email        String?  @unique
-  apiKey       String?  @unique
+  id         String   @id @default(cuid())
+  telegramId String?  @unique
+  email      String?  @unique
+  apiKey     String?  @unique
+  password   String?
+  role       UserRole @default(USER)
 
-  password     String?
+  // Telegram user fields
+  username        String?
+  firstName       String?
+  lastName        String?
+  languageCode    String?
+  isPremium       Boolean   @default(false)
+  isBot          Boolean   @default(false)
+  allowsWriteToPm Boolean   @default(true)
+  lastActivity    DateTime?
+  
+  // Telegram profile photo
+  photoUrl        String?
+  smallPhotoUrl   String?
+  
+  // Bot-specific settings
+  notificationsEnabled Boolean @default(true)
+  maxGroups           Int      @default(3)
+  maxSubscriptions    Int      @default(10)
 
   subscriptions UserSubscription[]
   notifications Notification[]
-  reports Report[]
-
-  role UserRole @default(USER)
+  reports       Report[]
+  ownedGroups   TelegramGroup[] @relation("GroupOwner")
+  memberGroups  TelegramGroup[] @relation("GroupMembers")
+  adminGroups   TelegramGroup[] @relation("GroupAdmins")
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-} 
+
+  @@index([username])
+  @@index([lastActivity])
+}
+
+model TelegramGroup {
+  id            String   @id @default(cuid())
+  telegramId    String   @unique
+  title         String
+  type          String   // supergroup, group
+  isActive      Boolean  @default(true)
+  maxSubscriptions Int   @default(5)
+  
+  ownerId       String
+  owner         User     @relation("GroupOwner", fields: [ownerId], references: [id])
+  
+  members       User[]   @relation("GroupMembers")
+  admins        User[]   @relation("GroupAdmins")
+  
+  subscriptions GroupSubscription[]
+  notifications Notification[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([ownerId])
+}
 
 model UserSubscription {
   id        String   @id @default(cuid())
-
   userId    String
-  user User @relation(fields: [userId], references: [id])
-
-  gameId String
-  game Game @relation(fields: [gameId], references: [id])
-
+  user      User     @relation(fields: [userId], references: [id])
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([gameId])
+}
+
+model GroupSubscription {
+  id        String   @id @default(cuid())
+  groupId   String
+  group     TelegramGroup @relation(fields: [groupId], references: [id])
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([groupId])
   @@index([gameId])
 }
 
@@ -108,44 +160,40 @@ enum NotificationType {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
-
-  userId    String
-  user User @relation(fields: [userId], references: [id])
-
+  id           String   @id @default(cuid())
+  type         NotificationType @default(UPDATE)
+  content      String?
   gameUpdateId String
-  gameUpdate GameUpdate @relation(fields: [gameUpdateId], references: [id])
+  gameUpdate   GameUpdate @relation(fields: [gameUpdateId], references: [id])
+  
+  // Optional relations for user OR group notifications
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id])
+  groupId      String?
+  group        TelegramGroup? @relation(fields: [groupId], references: [id])
 
-  type NotificationType @default(UPDATE)
-  content String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@index([userId])
+  @@index([groupId])
   @@index([gameUpdateId])
 }
 
 model Report {
   id        String   @id @default(cuid())
-
   userId    String
-  user User @relation(fields: [userId], references: [id])
-
+  user      User     @relation(fields: [userId], references: [id])
   content   String
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model UpdateCommand {
   id        String   @id @default(cuid())
-
-  gameId String? @unique
-  game Game? @relation(fields: [gameId], references: [id])
-
-  command String
-
+  gameId    String?  @unique
+  game      Game?    @relation(fields: [gameId], references: [id])
+  command   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

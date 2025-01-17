@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { OTPInput, OTPInputContext } from "input-otp"
+import { OTPInput, OTPInputContext, SlotProps } from "input-otp"
 import { Minus } from "lucide-react"
 
-import { cn } from "@repo/ui/lib/utils"
+import { cn } from "../lib/utils"
 
 const InputOTP = React.forwardRef<
   React.ElementRef<typeof OTPInput>,
@@ -30,25 +30,33 @@ const InputOTPGroup = React.forwardRef<
 ))
 InputOTPGroup.displayName = "InputOTPGroup"
 
+interface InputOTPSlotProps extends React.ComponentPropsWithoutRef<"div"> {
+  index: number
+}
+
 const InputOTPSlot = React.forwardRef<
   React.ElementRef<"div">,
-  React.ComponentPropsWithoutRef<"div"> & { index: number }
+  InputOTPSlotProps
 >(({ index, className, ...props }, ref) => {
   const inputOTPContext = React.useContext(OTPInputContext)
-  const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index]
+  const slot = inputOTPContext?.slots?.[index] as SlotProps & {
+    char: string
+    hasFakeCaret: boolean
+    isActive: boolean
+  }
 
   return (
     <div
       ref={ref}
       className={cn(
         "relative flex h-9 w-9 items-center justify-center border-y border-r border-input text-sm shadow-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md",
-        isActive && "z-10 ring-1 ring-ring",
+        slot.isActive && "z-10 ring-1 ring-ring",
         className
       )}
       {...props}
     >
-      {char}
-      {hasFakeCaret && (
+      {slot.char}
+      {slot.hasFakeCaret && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div className="h-4 w-px animate-caret-blink bg-foreground duration-1000" />
         </div>

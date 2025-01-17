@@ -46,22 +46,6 @@ class EnvironmentVariables {
   REDIS_PREFIX: string = 'api';
 
   @IsString()
-  @IsNotEmpty()
-  JWT_SECRET: string;
-
-  @IsString()
-  @IsNotEmpty()
-  JWT_REFRESH_SECRET: string;
-
-  @IsString()
-  @IsOptional()
-  JWT_ACCESS_EXPIRES_IN: string = '15m';
-
-  @IsString()
-  @IsOptional()
-  JWT_REFRESH_EXPIRES_IN: string = '7d';
-
-  @IsString()
   @IsOptional()
   TELEGRAM_BOT_TOKEN: string;
 }

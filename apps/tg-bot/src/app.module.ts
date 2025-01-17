@@ -15,28 +15,28 @@ import { VersionInterceptor } from './common/interceptors/version.interceptor';
 
 import helmet from 'helmet';
 
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { CacheModule } from './common/modules/cache/cache.module';
 
 import { AuthModule } from './domains/auth/auth.module';
 import { ApiKeyGuard } from './domains/auth/v1/guards/api-key.guard';
 import { PrismaModule } from './common/modules/prisma/prisma.module';
 import { HealthCheckModule } from './domains/health-check/health-check.module';
+import { CommandsModule } from './commands/commands.module';
+import { GroupModule } from './domains/groups/group.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       validate,
       load: [appConfig, redisConfig, authConfig],
-    }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
+      envFilePath: ['.env'],
     }),
     PrismaModule,
     CacheModule,
     AuthModule,
     HealthCheckModule,
+    CommandsModule,
+    GroupModule,
   ],
   providers: [
     {

@@ -20,13 +20,21 @@ import { Route as MessagesImport } from './routes/messages'
 import { Route as LoginImport } from './routes/login'
 import { Route as GamesImport } from './routes/games'
 import { Route as GameProvidersImport } from './routes/game-providers'
+import { Route as UsersUserIdImport } from './routes/users.$userId'
 
 // Create Virtual Routes
 
+const MetricsLazyImport = createFileRoute('/metrics')()
 const AboutLazyImport = createFileRoute('/about')()
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
+
+const MetricsLazyRoute = MetricsLazyImport.update({
+  id: '/metrics',
+  path: '/metrics',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/metrics.lazy').then((d) => d.Route))
 
 const AboutLazyRoute = AboutLazyImport.update({
   id: '/about',
@@ -81,6 +89,12 @@ const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+
+const UsersUserIdRoute = UsersUserIdImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => UsersRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -149,10 +163,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutLazyImport
       parentRoute: typeof rootRoute
     }
+    '/metrics': {
+      id: '/metrics'
+      path: '/metrics'
+      fullPath: '/metrics'
+      preLoaderRoute: typeof MetricsLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/users/$userId': {
+      id: '/users/$userId'
+      path: '/$userId'
+      fullPath: '/users/$userId'
+      preLoaderRoute: typeof UsersUserIdImport
+      parentRoute: typeof UsersImport
+    }
   }
 }
 
 // Create and export the route tree
+
+interface UsersRouteChildren {
+  UsersUserIdRoute: typeof UsersUserIdRoute
+}
+
+const UsersRouteChildren: UsersRouteChildren = {
+  UsersUserIdRoute: UsersUserIdRoute,
+}
+
+const UsersRouteWithChildren = UsersRoute._addFileChildren(UsersRouteChildren)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
@@ -162,8 +200,10 @@ export interface FileRoutesByFullPath {
   '/messages': typeof MessagesRoute
   '/settings': typeof SettingsRoute
   '/unauthorized': typeof UnauthorizedRoute
-  '/users': typeof UsersRoute
+  '/users': typeof UsersRouteWithChildren
   '/about': typeof AboutLazyRoute
+  '/metrics': typeof MetricsLazyRoute
+  '/users/$userId': typeof UsersUserIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -174,8 +214,10 @@ export interface FileRoutesByTo {
   '/messages': typeof MessagesRoute
   '/settings': typeof SettingsRoute
   '/unauthorized': typeof UnauthorizedRoute
-  '/users': typeof UsersRoute
+  '/users': typeof UsersRouteWithChildren
   '/about': typeof AboutLazyRoute
+  '/metrics': typeof MetricsLazyRoute
+  '/users/$userId': typeof UsersUserIdRoute
 }
 
 export interface FileRoutesById {
@@ -187,8 +229,10 @@ export interface FileRoutesById {
   '/messages': typeof MessagesRoute
   '/settings': typeof SettingsRoute
   '/unauthorized': typeof UnauthorizedRoute
-  '/users': typeof UsersRoute
+  '/users': typeof UsersRouteWithChildren
   '/about': typeof AboutLazyRoute
+  '/metrics': typeof MetricsLazyRoute
+  '/users/$userId': typeof UsersUserIdRoute
 }
 
 export interface FileRouteTypes {
@@ -203,6 +247,8 @@ export interface FileRouteTypes {
     | '/unauthorized'
     | '/users'
     | '/about'
+    | '/metrics'
+    | '/users/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -214,6 +260,8 @@ export interface FileRouteTypes {
     | '/unauthorized'
     | '/users'
     | '/about'
+    | '/metrics'
+    | '/users/$userId'
   id:
     | '__root__'
     | '/'
@@ -225,6 +273,8 @@ export interface FileRouteTypes {
     | '/unauthorized'
     | '/users'
     | '/about'
+    | '/metrics'
+    | '/users/$userId'
   fileRoutesById: FileRoutesById
 }
 
@@ -236,8 +286,9 @@ export interface RootRouteChildren {
   MessagesRoute: typeof MessagesRoute
   SettingsRoute: typeof SettingsRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
-  UsersRoute: typeof UsersRoute
+  UsersRoute: typeof UsersRouteWithChildren
   AboutLazyRoute: typeof AboutLazyRoute
+  MetricsLazyRoute: typeof MetricsLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -248,8 +299,9 @@ const rootRouteChildren: RootRouteChildren = {
   MessagesRoute: MessagesRoute,
   SettingsRoute: SettingsRoute,
   UnauthorizedRoute: UnauthorizedRoute,
-  UsersRoute: UsersRoute,
+  UsersRoute: UsersRouteWithChildren,
   AboutLazyRoute: AboutLazyRoute,
+  MetricsLazyRoute: MetricsLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -270,7 +322,8 @@ export const routeTree = rootRoute
         "/settings",
         "/unauthorized",
         "/users",
-        "/about"
+        "/about",
+        "/metrics"
       ]
     },
     "/": {
@@ -295,10 +348,20 @@ export const routeTree = rootRoute
       "filePath": "unauthorized.tsx"
     },
     "/users": {
-      "filePath": "users.tsx"
+      "filePath": "users.tsx",
+      "children": [
+        "/users/$userId"
+      ]
     },
     "/about": {
       "filePath": "about.lazy.tsx"
+    },
+    "/metrics": {
+      "filePath": "metrics.lazy.tsx"
+    },
+    "/users/$userId": {
+      "filePath": "users.$userId.tsx",
+      "parent": "/users"
     }
   }
 }

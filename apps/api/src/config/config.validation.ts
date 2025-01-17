@@ -64,6 +64,18 @@ class EnvironmentVariables {
   @IsString()
   @IsOptional()
   TELEGRAM_BOT_TOKEN: string;
+
+  @IsString()
+  @IsNotEmpty()
+  KAFKA_BROKERS: string;
+
+  @IsString()
+  @IsOptional()
+  KAFKA_CLIENT_ID: string = 'api';
+
+  @IsString()
+  @IsOptional()
+  KAFKA_CONSUMER_GROUP_ID: string = 'api-consumer-group';
 }
 
 export function validate(config: Record<string, unknown>) {

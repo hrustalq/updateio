@@ -13,30 +13,31 @@ import { VersionInterceptor } from './common/interceptors/version.interceptor';
 
 import helmet from 'helmet';
 
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
-
 import { AuthModule } from './domains/auth/auth.module';
 import { ApiKeyGuard } from './domains/auth/v1/guards/api-key.guard';
 import { PrismaModule } from './common/modules/prisma/prisma.module';
 import { HealthCheckModule } from './domains/health-check/health-check.module';
 import { DiscordModule } from './common/modules/discord/discord.module';
 import { GameUpdatesModule } from './domains/game-updates/game-updates.module';
+import { UpdateModule } from './domains/updates/update.module';
+import { CommandsModule } from './domains/commands/commands.module';
+import { MetricsModule } from './infrastructure/monitoring/metrics.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       validate,
       load: [appConfig],
-    }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
+      isGlobal: true,
     }),
     PrismaModule,
     AuthModule,
     HealthCheckModule,
     DiscordModule,
     GameUpdatesModule,
+    UpdateModule,
+    CommandsModule,
+    MetricsModule,
   ],
   providers: [
     {
